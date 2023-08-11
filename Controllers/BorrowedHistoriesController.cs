@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Controllers
 {
-    public class BorrowHistoriesController : Controller
+    public class BorrowedHistoriesController : Controller
     {
         private readonly AppDbContext _context;
 
-        public BorrowHistoriesController(AppDbContext context)
+        public BorrowedHistoriesController(AppDbContext context)
         {
             _context = context;
         }
