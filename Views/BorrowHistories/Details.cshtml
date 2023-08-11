@@ -1,0 +1,104 @@
+﻿@model LMS.Models.BorrowedHistory
+
+@{
+    ViewData["Title"] = "Details";
+    var a = Html.DisplayFor(model => model.BorrowedItems);
+}
+
+<h5>Details</h5>
+<h4>Borrowed History</h4>
+<hr />
+<div>
+    <a asp-action="Index" class="btn btn-outline-light text-primary"><span>&#8592;</span> Back</a>
+</div>
+<div class="row">
+    <dl class="col-md-4">
+        <dt>
+            @Html.DisplayNameFor(model => model.Borrower.CardNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Borrower.CardNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Borrower.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Borrower.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BorrowedDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BorrowedDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TotalCost)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TotalCost)
+        </dd>
+    </dl>
+    <div class="form-group my-4">
+        <a asp-action="Delete" asp-route-id="@Model?.Id" class="btn btn-outline-danger">Delete</a>
+    </div>
+    <div class="col-md-8">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BorrowedItems[0].Id)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BorrowedItems[0].Item.Type)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BorrowedItems[0].Item.Title)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BorrowedItems[0].Quantity)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BorrowedItems[0].Item.Price)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.BorrowedItems[0].Cost) ( = Quantity X Price)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.BorrowedItems != null)
+                {
+                    @foreach (var item in Model.BorrowedItems)
+                    {
+                        <tr>
+                            <td>
+                                @item.Id
+                            </td>
+                            <td>
+                                @item.Item.Type
+                            </td>
+                            <td>
+                                @item.Item.Title
+                            </td>
+                            <td>
+                                @item.Quantity
+                            </td>
+                            <td>
+                                @item.Item.Price
+                            </td>
+                            <td>
+                                @item.Cost
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="5"></td>
+                        <td>
+                            <b>@Html.DisplayNameFor(model => model.TotalCost)</b>: @Html.DisplayFor(model => model.TotalCost)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
