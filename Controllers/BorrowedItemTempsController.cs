@@ -14,14 +14,6 @@ namespace LMS.Controllers
             _context = context;
         }
 
-        // GET: BorrowedItemTemps
-        public async Task<IActionResult> Index()
-        {
-            return _context.BorrowedItemTemps != null ?
-                        View(await _context.BorrowedItemTemps.ToListAsync()) :
-                        Problem("Entity set 'AppDbContext.BorrowedItemTemp'  is null.");
-        }
-
         // GET: BorrowedItemTemps/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -44,7 +36,13 @@ namespace LMS.Controllers
         // GET: BorrowedItemTemps/Create
         public IActionResult Create()
         {
-            ViewData["ItemId"] = new SelectList(_context.Items, "Id", "Title");
+            var itemSelectList = _context.Items
+            .Select(b => new
+            {
+                Value = b.Id,
+                Text = $"{b.Title} - {b.Type}"
+            });
+            ViewData["ItemId"] = new SelectList(itemSelectList, "Value", "Text");
             return View();
         }
 
@@ -55,7 +53,12 @@ namespace LMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ItemId,Quantity,Cost")] BorrowedItemTemp borrowedItemTemp)
         {
-            borrowedItemTemp.Cost = borrowedItemTemp.Quantity * _context.Items.Find(borrowedItemTemp.ItemId).Price;
+            var item = await _context.Items.FirstOrDefaultAsync(_ => _.Id == borrowedItemTemp.ItemId);
+            if(item == null)
+            {
+                return NotFound();
+            }
+            borrowedItemTemp.Cost = borrowedItemTemp.Quantity * item.Price;
             if (ModelState.IsValid)
             {
                 _context.Add(borrowedItemTemp);

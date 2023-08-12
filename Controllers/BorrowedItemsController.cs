@@ -13,13 +13,6 @@ namespace LMS.Controllers
             _context = context;
         }
 
-        // GET: BorrowedItems
-        public async Task<IActionResult> Index()
-        {
-            var appDbContext = _context.BorrowedItems.Include(b => b.BorrowedHistory).Include(b => b.Item);
-            return View(await appDbContext.ToListAsync());
-        }
-
         public async Task<IActionResult> Create(int id)
         {
             var borrowHistoryId = id;

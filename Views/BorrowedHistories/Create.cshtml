@@ -4,9 +4,6 @@
     ViewData["Title"] = "Create";
 }
 
-<h5>Create</h5>
-<h4>Borrowed History</h4>
-<hr />
 <div>
     <a asp-action="Index" class="btn btn-outline-light text-primary"><span>&#8592;</span> Back</a>
 </div>
@@ -17,7 +14,7 @@
             <div class="form-group my-2">
                 <label asp-for="BorrowerId" class="control-label"></label>
                 <select asp-for="BorrowerId" class="form-control" asp-items="ViewBag.BorrowerId">
-                    <option value="2" selected>---Select Borrower---</option>
+                    <option value="" selected>---Select Borrower---</option>
                 </select>
                 <span asp-validation-for="BorrowerId" class="text-danger"></span>
             </div>
@@ -37,56 +34,52 @@
             </div>
         </form>
     </div>
-    <div class="col-md-8">
-        <div class="float-end"><a asp-action="Create" asp-controller="BorrowedItemTemps" class="btn btn-primary">Add Item</a></div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        @Html.DisplayNameFor(model => model.BorrowedItems.First().Id)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.BorrowedItems.First().Item)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.BorrowedItems.First().Quantity)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.BorrowedItems.First().Cost)
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (ViewBag.BorrowedItemTemps != null)
-                {
-                    @foreach (var item in ViewBag.BorrowedItemTemps)
+    <div class="col-md-8 d-flex flex-column">
+        <div class="align-self-end"><a asp-action="Create" asp-controller="BorrowedItemTemps" class="btn btn-primary">Add Item</a></div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.BorrowedItems.First().Item)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.BorrowedItems.First().Quantity)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.BorrowedItems.First().Cost)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.BorrowedItemTemps != null)
                     {
-                        <tr>
-                            <td>
-                                @item.Id
-                            </td>
-                            <td>
-                                @item.ItemId
-                            </td>
-                            <td>
-                                @item.Quantity
-                            </td>
-                            <td>
-                                @item.Cost
-                            </td>
-                            <td>
-                                <div class="float-end btn-group btn-group-sm">
-                                    <a asp-action="Edit" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-warning">Edit</a>
-                                    <a asp-action="Details" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-info">Details</a>
-                                    <a asp-action="Delete" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
-                                </div>
-                            </td>
-                        </tr>
+                        @foreach (var item in ViewBag.BorrowedItemTemps)
+                        {
+                            <tr>
+                                <td>
+                                    @item.Item.Title
+                                </td>
+                                <td>
+                                    @item.Quantity
+                                </td>
+                                <td>
+                                    @item.Cost
+                                </td>
+                                <td>
+                                    <div class="float-end btn-group btn-group-sm">
+                                        <a asp-action="Edit" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-warning">Edit</a>
+                                        <a asp-action="Details" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-info">Details</a>
+                                        <a asp-action="Delete" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

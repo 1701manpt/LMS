@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.WebUtilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
-namespace LMS.Helpers
+namespace LMS.TagHelpers
 {
     public static class BreadcrumbHelper
     {
@@ -18,7 +15,6 @@ namespace LMS.Helpers
             var action = routeData.Values["action"]?.ToString();
             var parameters = htmlHelper.ViewContext.HttpContext.Request.Query;
             var fragments = htmlHelper.ViewContext.HttpContext.Request.Query["_fragment"];
-            var currentUrl = htmlHelper.ViewContext.HttpContext.Request.Path;
 
             var breadcrumbItems = new List<string>();
 
@@ -42,30 +38,30 @@ namespace LMS.Helpers
                 breadcrumbItems.Add($"Fragment: {fragments}");
             }
 
-            breadcrumb.Append("<nav aria-label=\"breadcrumb\"><ol class=\"breadcrumb\">");
+            breadcrumb.Append("<nav style=\"--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);\" aria-label=\"breadcrumb\"><ol class=\"breadcrumb\">");
 
             for (int i = 0; i < breadcrumbItems.Count; i++)
             {
                 var breadcrumbItem = breadcrumbItems[i];
 
-                if (i == breadcrumbItems.Count - 1)
+                if (i == 0)
                 {
-                    breadcrumb.AppendFormat("<li class=\"breadcrumb-item active\">{0}</li>", breadcrumbItem);
+                    breadcrumb.AppendFormat("<li class=\"breadcrumb-item\"><a class=\"text-decoration-none\" href=\"/{0}\">{1}</a></li>", breadcrumbItem.ToLower(), AddSpacesToCamelCase(breadcrumbItem));
                 }
                 else
                 {
-                    breadcrumb.AppendFormat("<li class=\"breadcrumb-item\"><a href=\"{0}\">{0}</a></li>", GetBreadcrumbLink(breadcrumbItems.Take(i + 1)));
+                    breadcrumb.AppendFormat("<li class=\"breadcrumb-item\">{0}</li>", breadcrumbItem);
                 }
             }
 
-            breadcrumb.Append("</ol></nav>");
+            breadcrumb.Append("</ol></nav><hr />");
 
             return new HtmlString(breadcrumb.ToString());
         }
 
-        private static string GetBreadcrumbLink(IEnumerable<string> items)
+        private static string AddSpacesToCamelCase(string input)
         {
-            return "/" + string.Join("/", items);
+            return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
         }
     }
 }

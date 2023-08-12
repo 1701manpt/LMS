@@ -19,8 +19,7 @@ namespace LMS.Controllers
         {
             var appDbContext = _context.BorrowedHistories
                 .Include(b => b.Borrower)
-                .Include(b => b.BorrowedItems)
-                .ThenInclude(bi => bi.Item);
+                .Include(b => b.BorrowedItems);
             return View(await appDbContext.ToListAsync());
         }
 
@@ -48,27 +47,21 @@ namespace LMS.Controllers
         // GET: BorrowedHistories/Create
         public IActionResult Create()
         {
-            var borrowerList = _context.Borrowers
+            var borrowerSelectList = _context.Borrowers
                .Select(b => new
                {
                    Value = b.Id,
                    Text = $"{b.CardNumber} - {b.Name}"
                });
-            ViewData["BorrowerId"] = new SelectList(borrowerList, "Value", "Text");
-            //ViewData["BorrowerId"] = new SelectList(_context.Borrowers, "Id", "Name");
-            DateTime currentDate = DateTime.Now;
-            string formattedDate = currentDate.ToString("dd-MM-yyyy");
-            ViewData["BorrowedDate"] = formattedDate;
+            ViewData["BorrowerId"] = new SelectList(borrowerSelectList, "Value", "Text");
+            string currentDate = DateTime.Now.ToString("dd-MM-yyyy");
+            ViewData["BorrowedDate"] = currentDate;
 
-            var borrowedItemTempList = _context.BorrowedItemTemps.ToList();
+            var borrowedItemTempList = _context.BorrowedItemTemps.Include(bit => bit.Item);
 
             ViewData["BorrowedItemTemps"] = borrowedItemTempList;
 
-            decimal totalCost = 0;
-            foreach (var item in borrowedItemTempList)
-            {
-                totalCost += (decimal)item.Cost;
-            }
+            decimal totalCost = (decimal)_context.BorrowedItemTemps.Sum(bit => bit.Cost); ;
 
             ViewData["TotalCost"] = totalCost;
 
@@ -82,7 +75,13 @@ namespace LMS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,BorrowerId,BorrowedDate,TotalCost")] BorrowedHistory borrowHistory)
         {
+            var borrower = await _context.Borrowers.FirstOrDefaultAsync(_ => _.Id == borrowHistory.BorrowerId);
+            if (borrower == null)
+            {
+                return NotFound();
+            }
             borrowHistory.BorrowedDate = DateTime.Now;
+            borrowHistory.TotalCost = (decimal)_context.BorrowedItemTemps.Sum(bit => bit.Cost);
             if (ModelState.IsValid)
             {
                 await _context.BorrowedHistories.AddAsync(borrowHistory);

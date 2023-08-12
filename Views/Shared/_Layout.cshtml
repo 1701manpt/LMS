@@ -47,10 +47,9 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
-            @* @using LMS.Helpers; *@
+            @using LMS.TagHelpers;
 
-            @* @Html.Breadcrumb() *@
-            @* <hr /> *@
+            @Html.Breadcrumb()
             @RenderBody()
         </main>
     </div>

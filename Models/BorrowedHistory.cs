@@ -16,7 +16,7 @@ namespace LMS.Models
 
         [Display(Name = "Total Cost")]
         [Range(1, double.MaxValue)]
-        public decimal? TotalCost { get; set; }
+        public decimal TotalCost { get; set; }
 
         public Borrower? Borrower { get; set; } // Navigation property đến Borrower
         public List<BorrowedItem>? BorrowedItems { get; set; }
