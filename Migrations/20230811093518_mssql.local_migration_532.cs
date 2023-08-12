@@ -1,12 +1,11 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace LMS.Migrations
 {
     /// <inheritdoc />
-    public partial class mssqllocal_migration_227 : Migration
+    public partial class mssqllocal_migration_532 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -53,7 +52,7 @@ namespace LMS.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BorrowerId = table.Column<int>(type: "int", nullable: false),
                     BorrowedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -74,7 +73,7 @@ namespace LMS.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ItemId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -96,7 +95,7 @@ namespace LMS.Migrations
                     ItemId = table.Column<int>(type: "int", nullable: false),
                     BorrowHistoryId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {

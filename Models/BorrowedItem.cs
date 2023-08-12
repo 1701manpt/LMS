@@ -14,7 +14,7 @@ namespace LMS.Models
         public int Quantity { get; set; }
 
         [Range(0.01, double.MaxValue)]
-        public decimal Cost { get; set; }
+        public decimal? Cost { get; set; }
 
 
         public Item? Item { get; set; } // Navigation property đến Item

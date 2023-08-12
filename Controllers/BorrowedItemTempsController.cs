@@ -115,7 +115,7 @@ namespace LMS.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Details", new {Id = borrowedItemTemp.Id});
+                return RedirectToAction("Details", new { Id = borrowedItemTemp.Id });
             }
             return View(borrowedItemTemp);
         }

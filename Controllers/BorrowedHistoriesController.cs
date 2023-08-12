@@ -19,7 +19,8 @@ namespace LMS.Controllers
         {
             var appDbContext = _context.BorrowedHistories
                 .Include(b => b.Borrower)
-                .Include(b => b.BorrowedItems);
+                .Include(b => b.BorrowedItems)
+                .ThenInclude(bi => bi.Item);
             return View(await appDbContext.ToListAsync());
         }
 
@@ -50,17 +51,18 @@ namespace LMS.Controllers
             var borrowerList = _context.Borrowers
                .Select(b => new
                {
-                   Value = b.Id.ToString(),
+                   Value = b.Id,
                    Text = $"{b.CardNumber} - {b.Name}"
                });
-            ViewBag.BorrowerId = (IEnumerable<SelectListItem>)new SelectList(borrowerList, "Value", "Text");
+            ViewData["BorrowerId"] = new SelectList(borrowerList, "Value", "Text");
+            //ViewData["BorrowerId"] = new SelectList(_context.Borrowers, "Id", "Name");
             DateTime currentDate = DateTime.Now;
             string formattedDate = currentDate.ToString("dd-MM-yyyy");
             ViewData["BorrowedDate"] = formattedDate;
 
             var borrowedItemTempList = _context.BorrowedItemTemps.ToList();
 
-            ViewData["BorrowedItems"] = borrowedItemTempList;
+            ViewData["BorrowedItemTemps"] = borrowedItemTempList;
 
             decimal totalCost = 0;
             foreach (var item in borrowedItemTempList)

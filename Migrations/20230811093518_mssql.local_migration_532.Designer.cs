@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LMS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230811083913_mssql.local_migration_227")]
-    partial class mssqllocal_migration_227
+    [Migration("20230811093518_mssql.local_migration_532")]
+    partial class mssqllocal_migration_532
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,7 @@ namespace LMS.Migrations
                     b.Property<int>("BorrowerId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalCost")
+                    b.Property<decimal?>("TotalCost")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -59,7 +59,7 @@ namespace LMS.Migrations
                     b.Property<int>("BorrowHistoryId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Cost")
+                    b.Property<decimal?>("Cost")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ItemId")
@@ -85,7 +85,7 @@ namespace LMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Cost")
+                    b.Property<decimal?>("Cost")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ItemId")

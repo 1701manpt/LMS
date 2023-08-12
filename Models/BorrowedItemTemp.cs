@@ -15,7 +15,7 @@ namespace LMS.Models
 
         [Display(Name = "Cost")]
         [Range(0.01, double.MaxValue)]
-        public decimal Cost { get; set; }
+        public decimal? Cost { get; set; }
 
         public Item? Item { get; set; }
     }

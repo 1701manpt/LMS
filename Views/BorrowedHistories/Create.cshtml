@@ -1,4 +1,4 @@
-﻿@model LMS.ViewModels.BorrowVM
+﻿@model LMS.Models.BorrowedHistory
 
 @{
     ViewData["Title"] = "Create";
@@ -15,21 +15,21 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group my-2">
-                <label asp-for="BorrowedHistory.BorrowerId" class="control-label"></label>
-                <select asp-for="BorrowedHistory.BorrowerId" class="form-control" asp-items="ViewBag.BorrowerId">
-                    <option value="" selected>---Select Borrower---</option>
+                <label asp-for="BorrowerId" class="control-label"></label>
+                <select asp-for="BorrowerId" class="form-control" asp-items="ViewBag.BorrowerId">
+                    <option value="2" selected>---Select Borrower---</option>
                 </select>
-                <span asp-validation-for="BorrowedHistory.BorrowerId" class="text-danger"></span>
+                <span asp-validation-for="BorrowerId" class="text-danger"></span>
             </div>
             <div class="form-group my-2">
-                <label asp-for="BorrowedHistory.BorrowedDate" class="control-label"></label>
+                <label asp-for="BorrowedDate" class="control-label"></label>
                 <input type="text" class="form-control" value="@ViewBag.BorrowedDate" readonly />
-                <span asp-validation-for="BorrowedHistory.BorrowedDate" class="text-danger"></span>
+                <span asp-validation-for="BorrowedDate" class="text-danger"></span>
             </div>
             <div class="form-group my-2">
-                <label asp-for="BorrowedHistory.TotalCost" class="control-label"></label>
-                <input asp-for="BorrowedHistory.TotalCost" class="form-control" readonly value="@ViewBag.TotalCost" />
-                <span asp-validation-for="BorrowedHistory.TotalCost" class="text-danger"></span>
+                <label asp-for="TotalCost" class="control-label"></label>
+                <input asp-for="TotalCost" class="form-control" readonly value="@ViewBag.TotalCost" />
+                <span asp-validation-for="TotalCost" class="text-danger"></span>
             </div>
 
             <div class="form-group my-4">
@@ -43,24 +43,24 @@
             <thead>
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.Index)
+                        @Html.DisplayNameFor(model => model.BorrowedItems.First().Id)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.BorrowedItem.Item)
+                        @Html.DisplayNameFor(model => model.BorrowedItems.First().Item)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.BorrowedItem.Quantity)
+                        @Html.DisplayNameFor(model => model.BorrowedItems.First().Quantity)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.BorrowedItem.Cost)
+                        @Html.DisplayNameFor(model => model.BorrowedItems.First().Cost)
                     </th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                @if (ViewBag.BorrowedItems != null)
+                @if (ViewBag.BorrowedItemTemps != null)
                 {
-                    @foreach (var item in ViewBag.BorrowedItems)
+                    @foreach (var item in ViewBag.BorrowedItemTemps)
                     {
                         <tr>
                             <td>

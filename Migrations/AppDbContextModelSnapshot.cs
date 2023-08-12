@@ -35,7 +35,7 @@ namespace LMS.Migrations
                     b.Property<int>("BorrowerId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalCost")
+                    b.Property<decimal?>("TotalCost")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -56,7 +56,7 @@ namespace LMS.Migrations
                     b.Property<int>("BorrowHistoryId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Cost")
+                    b.Property<decimal?>("Cost")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ItemId")
@@ -82,7 +82,7 @@ namespace LMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Cost")
+                    b.Property<decimal?>("Cost")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ItemId")
