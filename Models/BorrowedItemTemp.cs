@@ -14,8 +14,13 @@ namespace LMS.Models
         public int Quantity { get; set; }
 
         [Display(Name = "Cost")]
-        [Range(0.01, double.MaxValue)]
-        public decimal? Cost { get; set; }
+        [Range(0, double.MaxValue)]
+        [DisplayFormat(DataFormatString = "{0:F0}")]
+        [RegularExpression(
+            @"^(500|[1-9]\d*000)$",
+            ErrorMessage = "The field Cost is invalid."
+        )]
+        public decimal? Cost { get; set; } // sẽ không lưu dữ liệu // chỉ có borrowedItem mới lưu
 
         public Item? Item { get; set; }
     }

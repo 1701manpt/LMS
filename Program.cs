@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("vi-VN");
 
 var builder = WebApplication.CreateBuilder(args);
 

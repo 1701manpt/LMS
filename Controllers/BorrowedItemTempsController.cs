@@ -51,14 +51,13 @@ namespace LMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ItemId,Quantity,Cost")] BorrowedItemTemp borrowedItemTemp)
+        public async Task<IActionResult> Create([Bind("Id,ItemId,Quantity")] BorrowedItemTemp borrowedItemTemp)
         {
             var item = await _context.Items.FirstOrDefaultAsync(_ => _.Id == borrowedItemTemp.ItemId);
             if(item == null)
             {
                 return NotFound();
             }
-            borrowedItemTemp.Cost = borrowedItemTemp.Quantity * item.Price;
             if (ModelState.IsValid)
             {
                 _context.Add(borrowedItemTemp);

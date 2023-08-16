@@ -22,8 +22,12 @@ namespace LMS.Models
         public DateTime PublicationDate { get; set; }
 
         [Display(Name = "Price")]
-        [Range(0.01, double.MaxValue)]
-        [RegularExpression(@"^\d+(\.\d{1,2})?$")]
+        [Range(0, double.MaxValue)]
+        [DisplayFormat(DataFormatString = "{0:F0}")]
+        [RegularExpression(
+            @"^(500|[1-9]\d*000)$",
+            ErrorMessage = "The field Price is invalid."
+        )]
         public decimal Price { get; set; }
 
         [Display(Name = "Borrowed Items")]

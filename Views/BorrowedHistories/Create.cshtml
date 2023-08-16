@@ -9,6 +9,12 @@
 </div>
 <div class="row">
     <div class="col-md-4">
+        <form asp-action="SearchBorrowers">
+            <div class="input-group my-2">
+                <input type="text" name="keyword" class="form-control" placeholder="Enter card number" aria-describedby="button-addon2">
+                <input type="submit" class="btn btn-outline-info" id="button-addon2" value="Search" />
+            </div>
+        </form>
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group my-2">
@@ -25,9 +31,13 @@
             </div>
             <div class="form-group my-2">
                 <label asp-for="TotalCost" class="control-label"></label>
-                <input asp-for="TotalCost" class="form-control" readonly value="@ViewBag.TotalCost" />
+                <div class="input-group">
+                    <input asp-for="TotalCost" class="form-control" readonly value="@ViewBag.TotalCost">
+                    <span class="input-group-text"> ₫</span>
+                </div>
                 <span asp-validation-for="TotalCost" class="text-danger"></span>
             </div>
+            
 
             <div class="form-group my-4">
                 <input type="submit" value="Create" class="btn btn-primary form-control" />
@@ -65,13 +75,19 @@
                                     @item.Quantity
                                 </td>
                                 <td>
-                                    @item.Cost
+                                    @((item.Quantity * item.Item.Price).ToString("C"))
                                 </td>
                                 <td>
-                                    <div class="float-end btn-group btn-group-sm">
-                                        <a asp-action="Edit" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-warning">Edit</a>
-                                        <a asp-action="Details" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-info">Details</a>
-                                        <a asp-action="Delete" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                    <div class="float-end btn-group btn-group-sm gap-2">
+                                        <a asp-action="Edit" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-warning">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-info">
+                                            <i class="bi bi-info-square"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-controller="BorrowedItemTemps" asp-route-id="@item.Id" class="btn btn-outline-danger">
+                                            <i class="bi bi-x-square"></i>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>

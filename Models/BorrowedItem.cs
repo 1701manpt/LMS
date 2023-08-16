@@ -13,7 +13,12 @@ namespace LMS.Models
         [Range(1, int.MaxValue)]
         public int Quantity { get; set; }
 
-        [Range(0.01, double.MaxValue)]
+        [Range(0, double.MaxValue)]
+        [DisplayFormat(DataFormatString = "{0:F0}")]
+        [RegularExpression(
+            @"^(500|[1-9]\d*000)$",
+            ErrorMessage = "The field Cost is invalid."
+        )]
         public decimal? Cost { get; set; }
 
 

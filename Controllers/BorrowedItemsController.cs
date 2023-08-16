@@ -16,19 +16,21 @@ namespace LMS.Controllers
         public async Task<IActionResult> Create(int id)
         {
             var borrowHistoryId = id;
-            var borrowedItemTempList = await _context.BorrowedItemTemps.ToListAsync();
+            var borrowedItemTempList = await _context.BorrowedItemTemps
+                .Include(bit => bit.Item)
+                .ToListAsync();
 
-            foreach (var item in borrowedItemTempList)
+            foreach (var bit in borrowedItemTempList)
             {
                 var borrowedItem = new BorrowedItem
                 {
-                    ItemId = item.ItemId,
-                    Quantity = item.Quantity,
-                    Cost = item.Cost,
+                    ItemId = bit.ItemId,
+                    Quantity = bit.Quantity,
+                    Cost = bit.Quantity * bit.Item.Price,
                     BorrowHistoryId = borrowHistoryId
                 };
                 await _context.BorrowedItems.AddAsync(borrowedItem);
-                _context.BorrowedItemTemps.Remove(item);
+                _context.BorrowedItemTemps.Remove(bit);
             }
 
             await _context.SaveChangesAsync();

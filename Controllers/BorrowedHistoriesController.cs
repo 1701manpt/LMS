@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace LMS.Controllers
 {
@@ -44,6 +45,12 @@ namespace LMS.Controllers
             return View(borrowHistory);
         }
 
+        [HttpPost]
+        public IActionResult SearchBorrowers()
+        {
+            return Redirect("Create");
+        }
+
         // GET: BorrowedHistories/Create
         public IActionResult Create()
         {
@@ -61,9 +68,11 @@ namespace LMS.Controllers
 
             ViewData["BorrowedItemTemps"] = borrowedItemTempList;
 
-            decimal totalCost = (decimal)_context.BorrowedItemTemps.Sum(bit => bit.Cost); ;
+            decimal totalCost = _context.BorrowedItemTemps
+                .Include(bit => bit.Item)
+                .Sum(bit => bit.Quantity * bit.Item.Price);
 
-            ViewData["TotalCost"] = totalCost;
+            ViewData["TotalCost"] = totalCost.ToString("F0");
 
             return View();
         }
@@ -81,7 +90,9 @@ namespace LMS.Controllers
                 return NotFound();
             }
             borrowHistory.BorrowedDate = DateTime.Now;
-            borrowHistory.TotalCost = (decimal)_context.BorrowedItemTemps.Sum(bit => bit.Cost);
+            borrowHistory.TotalCost = _context.BorrowedItemTemps
+                .Include(bit => bit.Item)
+                .Sum(bit => bit.Quantity * bit.Item.Price);
             if (ModelState.IsValid)
             {
                 await _context.BorrowedHistories.AddAsync(borrowHistory);
