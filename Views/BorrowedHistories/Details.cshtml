@@ -40,9 +40,6 @@
                 <thead>
                     <tr>
                         <th>
-                            @Html.DisplayNameFor(model => model.BorrowedItems[0].Id)
-                        </th>
-                        <th>
                             @Html.DisplayNameFor(model => model.BorrowedItems[0].Item.Type)
                         </th>
                         <th>
@@ -63,24 +60,21 @@
                         {
                             <tr>
                                 <td>
-                                    @item.Id
+                                    @Html.DisplayFor(modelItem => item.Item.Type)
                                 </td>
                                 <td>
-                                    @item.Item.Type
+                                    @Html.DisplayFor(modelItem => item.Item.Title)
                                 </td>
                                 <td>
-                                    @item.Item.Title
-                                </td>
-                                <td>
-                                    @item.Quantity
+                                    @Html.DisplayFor(modelItem => item.Quantity)
                                 </td>
                                 <td colspan="2" class="text-end">
-                                    @item.Cost
+                                    @Html.DisplayFor(modelItem => item.Cost)
                                 </td>
                             </tr>
                         }
                         <tr>
-                            <td colspan="5"></td>
+                            <td colspan="3"></td>
                             <td>
                                 <b>@Html.DisplayNameFor(model => model.TotalCost)</b>
                             </td>

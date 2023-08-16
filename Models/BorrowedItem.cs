@@ -14,12 +14,12 @@ namespace LMS.Models
         public int Quantity { get; set; }
 
         [Range(0, double.MaxValue)]
-        [DisplayFormat(DataFormatString = "{0:F0}")]
+        [DisplayFormat(DataFormatString = "{0:C}")]
         [RegularExpression(
             @"^(500|[1-9]\d*000)$",
             ErrorMessage = "The field Cost is invalid."
         )]
-        public decimal? Cost { get; set; }
+        public decimal Cost { get; set; }
 
 
         public Item? Item { get; set; } // Navigation property đến Item

@@ -15,7 +15,7 @@ namespace LMS.Models
 
         [Display(Name = "Cost")]
         [Range(0, double.MaxValue)]
-        [DisplayFormat(DataFormatString = "{0:F0}")]
+        [DisplayFormat(DataFormatString = "{0:C}")]
         [RegularExpression(
             @"^(500|[1-9]\d*000)$",
             ErrorMessage = "The field Cost is invalid."

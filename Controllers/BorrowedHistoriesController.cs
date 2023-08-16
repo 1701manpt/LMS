@@ -64,7 +64,7 @@ namespace LMS.Controllers
             string currentDate = DateTime.Now.ToString("dd-MM-yyyy");
             ViewData["BorrowedDate"] = currentDate;
 
-            var borrowedItemTempList = _context.BorrowedItemTemps.Include(bit => bit.Item);
+            var borrowedItemTempList = (IEnumerable<BorrowedItemTemp>)_context.BorrowedItemTemps.Include(bit => bit.Item);
 
             ViewData["BorrowedItemTemps"] = borrowedItemTempList;
 

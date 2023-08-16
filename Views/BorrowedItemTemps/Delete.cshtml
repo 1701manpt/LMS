@@ -37,7 +37,7 @@
             @Html.DisplayNameFor(model => model.Cost)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Cost)
+            @((Model.Quantity * Model.Item.Price).ToString("C"))
         </dd>
     </dl>
     <div class="row">
