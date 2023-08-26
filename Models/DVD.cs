@@ -2,8 +2,8 @@
 
 namespace LMS.Models
 {
-    // Model DVD kế thừa từ Item
-    public class DVD : Item
+    // Model Dvd kế thừa từ Item
+    public class Dvd : Item
     {
         [Display(Name = "Run Time")]
         [Range(1, int.MaxValue)]

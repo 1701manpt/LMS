@@ -4,7 +4,7 @@
     public enum ItemType
     {
         Book,
-        DVD,
+        Dvd,
         Magazine
     }
 }

@@ -1,135 +1,163 @@
 ﻿using LMS.Models;
+using LMS.Services;
+using LMS.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Controllers
 {
     public class ItemsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IItemService _itemService;
 
-        public ItemsController(AppDbContext context)
+        public ItemsController(IItemService itemService)
         {
-            _context = context;
+            _itemService = itemService;
         }
 
         // GET: Items
-        public async Task<IActionResult> Index()
+        public IActionResult Index(string? title)
         {
-            return _context.Items != null ?
-                        View(await _context.Items.ToListAsync()) :
-                        Problem("Entity set 'AppDbContext.Items'  is null.");
+            try
+            {
+                if (!string.IsNullOrEmpty(title))
+                {
+                    ViewData["TitleItem"] = title;
+                    return View(_itemService.Search(title));
+                }
+
+                return View(_itemService.Index());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Search(string? title)
+        {
+            return RedirectToAction("Index", new { title });
         }
 
         // GET: Items/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
-            if (id == null || _context.Items == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var item = await _context.Items
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (item == null)
+                if (!_itemService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var item = _itemService.Details((int)id);
+
+                return View(item);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return View(item);
         }
 
         // GET: Items/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
-            if (id == null || _context.Items == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var item = await _context.Items.FindAsync(id);
-            if (item == null)
-            {
-                return NotFound();
+                if (!_itemService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var item = _itemService.Details((int)id);
+
+                return View(item);
             }
-            return View(item);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // POST: Items/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Title,Author,PublicationDate,Price")] Item item)
+        public IActionResult Edit(int id, [Bind("Id,Type,Title,Author,PublicationDate,Price")] Item item)
         {
-            if (id != item.Id)
+            try
             {
-                return NotFound();
-            }
+                if (id != item.Id)
+                {
+                    return NotFound();
+                }
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(item);
-                    await _context.SaveChangesAsync();
+                    _itemService.Edit(item);
+
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ItemExists(item.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return View(item);
             }
-            return View(item);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET: Items/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
-            if (id == null || _context.Items == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var item = await _context.Items
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (item == null)
+                if (!_itemService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var item = _itemService.Details((int)id);
+
+                return View(item);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return View(item);
         }
 
         // POST: Items/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            if (_context.Items == null)
+            try
             {
-                return Problem("Entity set 'AppDbContext.Items'  is null.");
+                _itemService.Delete(id);
+
+                return RedirectToAction(nameof(Index));
             }
-            var item = await _context.Items.FindAsync(id);
-            if (item != null)
+            catch (Exception ex)
             {
-                _context.Items.Remove(item);
+                return BadRequest(ex.Message);
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ItemExists(int id)
-        {
-            return (_context.Items?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

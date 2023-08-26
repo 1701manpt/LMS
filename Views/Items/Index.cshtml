@@ -4,6 +4,24 @@
     ViewData["Title"] = "Index";
 }
 
+<div class="row row-cols-2 g-3 mb-3">
+    <div class="col-auto">
+        <a href="#chua-lam" class="btn btn-primary">
+            <i class="bi bi-plus-square"></i>
+            <span class="ms-1">Chưa làm</span>
+        </a>
+    </div>
+    <div class="col-auto">
+        <form asp-action="Search">
+            <div class="input-group">
+                <input type="search" value="@ViewBag.TitleItem" name="title" class="form-control" placeholder="Enter title item">
+                <button type="submit" class="btn btn-info text-white">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 <div class="table-responsive">
     <table class="table text-center">
         <thead>
@@ -22,6 +40,12 @@
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.AvailableQuantity)
                 </th>
                 <th></th>
             </tr>
@@ -46,10 +70,13 @@
                         @Html.DisplayFor(modelItem => item.Price)
                     </td>
                     <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AvailableQuantity)
+                    </td>
+                    <td>
                         <div class="float-end btn-group btn-group-sm gap-2">
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info">
                                 <i class="bi bi-info-square"></i>
                             </a>

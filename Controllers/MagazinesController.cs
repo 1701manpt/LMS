@@ -1,4 +1,6 @@
 ﻿using LMS.Models;
+using LMS.Services;
+using LMS.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,37 +8,49 @@ namespace LMS.Controllers
 {
     public class MagazinesController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IMagazineService _magazineService;
 
-        public MagazinesController(AppDbContext context)
+        public MagazinesController(IMagazineService magazineService)
         {
-            _context = context;
+            _magazineService = magazineService;
         }
 
         // GET: Magazines
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return _context.Magazines != null ?
-                        View(await _context.Magazines.ToListAsync()) :
-                        Problem("Entity set 'AppDbContext.Magazines'  is null.");
+            try
+            {
+                return View(_magazineService.Index());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET: Magazines/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
-            if (id == null || _context.Magazines == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var magazine = await _context.Magazines
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (magazine == null)
+                if (!_magazineService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var magazine = _magazineService.Details((int)id);
+
+                return View(magazine);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return View(magazine);
         }
 
         // GET: Magazines/Create
@@ -49,109 +63,113 @@ namespace LMS.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Type,Title,Author,PublicationDate,Price")] Magazine magazine)
+        public IActionResult Create([Bind("Id,Type,Title,Author,PublicationDate,Price,Quantity")] Magazine magazine)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(magazine);
-                await _context.SaveChangesAsync();
+                _magazineService.Create(magazine);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(magazine);
         }
 
         // GET: Magazines/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
-            if (id == null || _context.Magazines == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var magazine = await _context.Magazines.FindAsync(id);
-            if (magazine == null)
-            {
-                return NotFound();
+                if (!_magazineService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var magazine = _magazineService.Details((int)id);
+
+                return View(magazine);
             }
-            return View(magazine);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // POST: Magazines/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,Title,Author,PublicationDate,Price")] Magazine magazine)
+        public IActionResult Edit(int id, [Bind("Id,Type,Title,Author,PublicationDate,Price")] Magazine magazine)
         {
-            if (id != magazine.Id)
+            try
             {
-                return NotFound();
-            }
+                if (id != magazine.Id)
+                {
+                    return NotFound();
+                }
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(magazine);
-                    await _context.SaveChangesAsync();
+                    _magazineService.Edit(magazine);
+
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MagazineExists(magazine.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return View(magazine);
             }
-            return View(magazine);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET: Magazines/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
-            if (id == null || _context.Magazines == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var magazine = await _context.Magazines
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (magazine == null)
+                if (!_magazineService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var magazine = _magazineService.Details((int)id);
+
+                return View(magazine);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return View(magazine);
         }
 
         // POST: Magazines/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            if (_context.Magazines == null)
+            try
             {
-                return Problem("Entity set 'AppDbContext.Magazines'  is null.");
+                _magazineService.Delete(id);
+
+                return RedirectToAction(nameof(Index));
             }
-            var magazine = await _context.Magazines.FindAsync(id);
-            if (magazine != null)
+            catch (Exception ex)
             {
-                _context.Magazines.Remove(magazine);
+                return BadRequest(ex.Message);
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool MagazineExists(int id)
-        {
-            return (_context.Magazines?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

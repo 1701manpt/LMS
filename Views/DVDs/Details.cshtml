@@ -1,4 +1,4 @@
-﻿@model LMS.Models.DVD
+﻿@model LMS.Models.Dvd
 
 @{
     ViewData["Title"] = "Details";
@@ -44,6 +44,18 @@
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Price)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Quantity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Quantity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AvailableQuantity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AvailableQuantity)
         </dd>
     </dl>
     <div>

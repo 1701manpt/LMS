@@ -39,16 +39,29 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Price)
         </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Quantity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Quantity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AvailableQuantity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AvailableQuantity)
+        </dd>
     </dl>
 
     <div class="row">
         <div class="col-md-4">
-            <div class="alert alert-danger" role="alert">
+            <span class="text-danger my-2">@ViewBag.ErrorRelationship</span>
+            <div class="alert alert-danger my-2" role="alert">
                 <h5>Are you sure you want to delete this?</h5>
             </div>
             <form asp-action="Delete">
                 <input type="hidden" asp-for="Id" />
-                <input type="submit" value="Delete" class="btn btn-danger form-control" />
+                <input type="submit" value="Delete" class="btn btn-danger form-control my-2" />
             </form>
         </div>
     </div>

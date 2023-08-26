@@ -1,157 +1,174 @@
 ﻿using LMS.Models;
+using LMS.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Controllers
 {
-    public class DVDsController : Controller
+    public class DvdsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IDvdService _dvdService;
 
-        public DVDsController(AppDbContext context)
+        public DvdsController(IDvdService dvdService)
         {
-            _context = context;
+            _dvdService = dvdService;
         }
 
-        // GET: DVDs
-        public async Task<IActionResult> Index()
+        // GET: Dvds
+        public IActionResult Index()
         {
-            return _context.DVDs != null ?
-                        View(await _context.DVDs.ToListAsync()) :
-                        Problem("Entity set 'AppDbContext.DVDs'  is null.");
-        }
-
-        // GET: DVDs/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.DVDs == null)
+            try
             {
-                return NotFound();
+                return View(_dvdService.Index());
             }
-
-            var dVD = await _context.DVDs
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (dVD == null)
+            catch(Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return View(dVD);
         }
 
-        // GET: DVDs/Create
+        // GET: Dvds/Details/5
+        public IActionResult Details(int? id)
+        {
+            try
+            {
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                if (!_dvdService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var item = _dvdService.Details((int)id);
+
+                return View(item);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // GET: Dvds/Create
         public IActionResult Create()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // POST: DVDs/Create
+        // POST: Dvds/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RunTime,Id,Type,Title,Author,PublicationDate,Price")] DVD dVD)
+        public IActionResult Create([Bind("RunTime,Id,Type,Title,Author,PublicationDate,Price,Quantity")] Dvd dvd)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(dVD);
-                await _context.SaveChangesAsync();
+                _dvdService.Create(dvd);
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(dVD);
+            return View(dvd);
         }
 
-        // GET: DVDs/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: Dvds/Edit/5
+        public IActionResult Edit(int? id)
         {
-            if (id == null || _context.DVDs == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var dVD = await _context.DVDs.FindAsync(id);
-            if (dVD == null)
-            {
-                return NotFound();
+                if (!_dvdService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var dvd = _dvdService.Details((int)id);
+
+                return View(dvd);
             }
-            return View(dVD);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // POST: DVDs/Edit/5
+        // POST: Dvds/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RunTime,Id,Type,Title,Author,PublicationDate,Price")] DVD dVD)
+        public IActionResult Edit(int id, [Bind("RunTime,Id,Type,Title,Author,PublicationDate,Price")] Dvd dvd)
         {
-            if (id != dVD.Id)
+            if (id != dvd.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(dVD);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DVDExists(dVD.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _dvdService.Edit(dvd);
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(dVD);
+
+            return View(dvd);
         }
 
-        // GET: DVDs/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: Dvds/Delete/5
+        public IActionResult Delete(int? id)
         {
-            if (id == null || _context.DVDs == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var dVD = await _context.DVDs
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (dVD == null)
+                if (!_dvdService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var dvd = _dvdService.Details((int)id);
+
+                return View(dvd);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return View(dVD);
         }
 
-        // POST: DVDs/Delete/5
+        // POST: Dvds/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            if (_context.DVDs == null)
+            try
             {
-                return Problem("Entity set 'AppDbContext.DVDs'  is null.");
+                _dvdService.Delete(id);
+
+                return RedirectToAction(nameof(Index));
             }
-            var dVD = await _context.DVDs.FindAsync(id);
-            if (dVD != null)
+            catch (Exception ex)
             {
-                _context.DVDs.Remove(dVD);
+                return BadRequest(ex.Message);
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool DVDExists(int id)
-        {
-            return (_context.DVDs?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

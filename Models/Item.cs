@@ -2,7 +2,7 @@
 
 namespace LMS.Models
 {
-    // Model Item chung cho Book, DVD, Magazine
+    // Model Item chung cho Book, Dvd, Magazine
     public abstract class Item
     {
         [Display(Name = "Id")]
@@ -12,10 +12,10 @@ namespace LMS.Models
         public ItemType Type { get; }
 
         [Display(Name = "Title")]
-        public string Title { get; set; }
+        public required string Title { get; set; }
 
         [Display(Name = "Author")]
-        public string Author { get; set; }
+        public required string Author { get; set; }
 
         [Display(Name = "Publication Date")]
         [DataType(DataType.Date)]
@@ -30,9 +30,15 @@ namespace LMS.Models
         )]
         public decimal Price { get; set; }
 
-        [Display(Name = "Borrowed Items")]
+        [Display(Name = "Quantity")]
+        public int Quantity { get; set; }
+
+        [Display(Name = "Available Quantity")]
+        public int AvailableQuantity { get; set; }
 
         public List<BorrowedItem>? BorrowedItems { get; set; }
         public List<BorrowedItemTemp>? BorrowedItemTemps { get; set; }
+        public List<CartItem>? CartItems { get; set; }
+        public List<CartItemTemp>? CartItemTemps { get; set; }
     }
 }

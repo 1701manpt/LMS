@@ -4,20 +4,35 @@
     ViewData["Title"] = "Index";
 }
 
-<div class="d-flex justify-content-end">
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
+<div class="g-3 row row-cols-2 mb-3">
+    <div class="col-auto">
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-square"></i>
+            Create new
+        </a>
+    </div>
+    <div class="col-auto">
+        <form asp-action="Search">
+            <div class="input-group">
+                <input type="search" value="@ViewBag.LibraryCardNumber" name="libraryCardNumber" class="form-control" placeholder="Enter library card number">
+                <button type="submit" class="btn btn-info text-white">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 <div class="table-responsive">
     <table class="table text-center">
         <thead>
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.CardNumber)
+                <th class="text-nowrap">
+                    @Html.DisplayNameFor(model => model.LibraryCardNumber)
                 </th>
-                <th>
+                <th class="text-nowrap">
                     @Html.DisplayNameFor(model => model.Name)
                 </th>
-                <th>
+                <th class="text-nowrap">
                     @Html.DisplayNameFor(model => model.Address)
                 </th>
                 <th></th>
@@ -27,8 +42,8 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CardNumber)
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.LibraryCardNumber)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Name)

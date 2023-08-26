@@ -1,157 +1,192 @@
 ﻿using LMS.Models;
+using LMS.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Controllers
 {
     public class BorrowersController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IBorrowerService _borrowerService;
 
-        public BorrowersController(AppDbContext context)
+        public BorrowersController(IBorrowerService borrowerService)
         {
-            _context = context;
+            _borrowerService = borrowerService;
         }
 
         // GET: Borrowers
-        public async Task<IActionResult> Index()
+        public IActionResult Index(string? libraryCardNumber)
         {
-            return _context.Borrowers != null ?
-                        View(await _context.Borrowers.ToListAsync()) :
-                        Problem("Entity set 'AppDbContext.Borrowers'  is null.");
+            try
+            {
+                if (!string.IsNullOrEmpty(libraryCardNumber))
+                {
+                    ViewData["LibraryCardNumber"] = libraryCardNumber;
+                    return View(_borrowerService.Search(libraryCardNumber));
+                }
+
+
+                return View(_borrowerService.Index());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Search(string? libraryCardNumber)
+        {
+            return RedirectToAction("Index", new { libraryCardNumber });
         }
 
         // GET: Borrowers/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
-            if (id == null || _context.Borrowers == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var borrower = await _context.Borrowers
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (borrower == null)
+                if (!_borrowerService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var borrower = _borrowerService.Details((int)id);
+
+                return View(borrower);
+            }
+            catch(Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return View(borrower);
         }
 
         // GET: Borrowers/Create
         public IActionResult Create()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // POST: Borrowers/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Address,CardNumber")] Borrower borrower)
+        public IActionResult Create([Bind("Id,Name,Address,LibraryCardNumber")] Borrower borrower)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(borrower);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Details", "Borrowers", new { id = borrower.Id });
+                _borrowerService.Create(borrower);
+
+                return RedirectToAction(nameof(Index));
             }
             return View(borrower);
         }
 
         // GET: Borrowers/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
-            if (id == null || _context.Borrowers == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var borrower = await _context.Borrowers.FindAsync(id);
-            if (borrower == null)
-            {
-                return NotFound();
+                if (!_borrowerService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var borrower = _borrowerService.Details((int)id);
+
+                return View(borrower);
             }
-            return View(borrower);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // POST: Borrowers/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Address,CardNumber")] Borrower borrower)
+        public IActionResult Edit(int id, [Bind("Id,Name,Address,LibraryCardNumber")] Borrower borrower)
         {
-            if (id != borrower.Id)
+            try
             {
-                return NotFound();
-            }
+                if (id != borrower.Id)
+                {
+                    return NotFound();
+                }
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(borrower);
-                    await _context.SaveChangesAsync();
+                    _borrowerService.Edit(borrower);
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BorrowerExists(borrower.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction("Details", "Borrowers", new { id = id });
+
+                return View(borrower);
             }
-            return View(borrower);
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET: Borrowers/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
-            if (id == null || _context.Borrowers == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var borrower = await _context.Borrowers
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (borrower == null)
+                if (!_borrowerService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var borrower = _borrowerService.Details((int)id);
+
+                return View(borrower);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return View(borrower);
         }
 
         // POST: Borrowers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            if (_context.Borrowers == null)
+            try
             {
-                return Problem("Entity set 'AppDbContext.Borrowers'  is null.");
+                _borrowerService.Delete(id);
+
+                return RedirectToAction(nameof(Index));
             }
-            var borrower = await _context.Borrowers.FindAsync(id);
-            if (borrower != null)
+            catch (Exception ex)
             {
-                _context.Borrowers.Remove(borrower);
+                return BadRequest(ex.Message);
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool BorrowerExists(int id)
-        {
-            return (_context.Borrowers?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace LMS.Models
 
         public int ItemId { get; set; } // Khóa ngoại tới Item
 
-        public int BorrowHistoryId { get; set; } // Khóa ngoại tới BorrowedHistory
+        public int BorrowedHistoryId { get; set; } // Khóa ngoại tới BorrowedHistory
 
         [Range(1, int.MaxValue)]
         public int Quantity { get; set; }
@@ -21,6 +21,8 @@ namespace LMS.Models
         )]
         public decimal Cost { get; set; }
 
+        [Display(Name = "Returned Quantity")]
+        public int? ReturnedQuantity { get; set; }
 
         public Item? Item { get; set; } // Navigation property đến Item
         public BorrowedHistory? BorrowedHistory { get; set; }

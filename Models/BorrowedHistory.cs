@@ -12,6 +12,7 @@ namespace LMS.Models
         public int BorrowerId { get; set; } // Khóa ngoại tới Borrower
 
         [Display(Name = "Borrowed Date")]
+        [DataType(DataType.Date)]
         public DateTime BorrowedDate { get; set; }
 
         [Display(Name = "Total Cost")]
@@ -22,6 +23,9 @@ namespace LMS.Models
             ErrorMessage = "The field Total Cost is invalid."
         )]
         public decimal TotalCost { get; set; }
+
+        [Display(Name = "Borrowed State")]
+        public BorrowedState? BorrowedState { get; set; }
 
         public Borrower? Borrower { get; set; } // Navigation property đến Borrower
         public List<BorrowedItem>? BorrowedItems { get; set; }

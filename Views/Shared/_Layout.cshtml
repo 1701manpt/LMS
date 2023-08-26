@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="~/LMS.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3 navbar-dark bg-dark">
+    <header class="sticky-top mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow navbar-dark bg-dark">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Library LMS</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -19,6 +19,9 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Carts" asp-action="Create">Cart</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-light" asp-area="" asp-controller="Borrowers" asp-action="Index">Borrower</a>
                         </li>
@@ -34,9 +37,12 @@
                                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
                                         <li><a class="dropdown-item text-light" asp-controller="Items" asp-action="Index">Item</a></li>
                                         <li><a class="dropdown-item text-light" asp-controller="Books" asp-action="Index">Book</a></li>
-                                        <li><a class="dropdown-item text-light" asp-controller="DVDs" asp-action="Index">DVD</a></li>
+                                        <li><a class="dropdown-item text-light" asp-controller="Dvds" asp-action="Index">Dvd</a></li>
                                         <li><a class="dropdown-item text-light" asp-controller="Magazines" asp-action="Index">Magazine</a></li>
                                     </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-light" asp-area="" asp-controller="Carts" asp-action="Index">Manage Cart (Admin)</a>
                                 </li>
                             </ul>
                         </li>
@@ -47,10 +53,13 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
-            @using LMS.TagHelpers;
+            @using LMS.Views.Shared.TagHelpers;
             @Html.Breadcrumb()
             @RenderBody()
         </main>
+    </div>
+    <div style="z-index: 100;" class="position-absolute col-md-3 bottom-0 end-0 m-3 mb-5 alert alert-warning @(string.IsNullOrEmpty(ViewBag.Error) ? "d-none" : "")" role="alert">
+        @ViewBag.Error
     </div>
     <footer class="border-top footer text-muted">
         <div class="container">

@@ -1,37 +1,64 @@
-﻿@model IEnumerable<LMS.Models.BorrowedHistory>
+﻿@model LMS.ViewModels.BorrowedHistories.IndexViewModel
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<div class="d-flex justify-content-end">
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
+<div class="g-3 row row-cols-2 mb-3">
+    <div class="col-auto">
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-square"></i>
+            Create New
+        </a>
+    </div>
+    <div class="col-auto">
+        <form asp-action="Search">
+            <div class="input-group">
+                @* <span class="input-group-text">Start Date</span> *@
+                <input asp-for="StartDate" class="form-control">
+                @* <span class="input-group-text">End Date</span> *@
+                <input asp-for="EndDate" class="form-control">
+                <select class="form-select" asp-for="BorrowerId" asp-items="Model.BorrowerSelectList">
+                    <option selected>--- Select Borrower ---</option>
+                </select>
+                <select class="form-select" asp-for="ItemId" asp-items="Model.ItemSelectList">
+                    <option selected>--- Select Item ---</option>
+                </select>
+                <select class="form-select" asp-for="BorrowedState" asp-items="Model.StateSelectList">
+                    <option selected>--- Select State ---</option>
+                </select>
+                <button type="submit" class="btn btn-info text-white">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 <div class="table-responsive">
     <table class="table text-center">
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Borrower.CardNumber)
+                    @Html.DisplayNameFor(model => model.BorrowedHistories.First().Borrower.LibraryCardNumber)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Borrower.Name)
+                    @Html.DisplayNameFor(model => model.BorrowedHistories.First().Borrower.Name)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.BorrowedDate)
+                    @Html.DisplayNameFor(model => model.BorrowedHistories.First().BorrowedDate)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.TotalCost)
+                    @Html.DisplayNameFor(model => model.BorrowedHistories.First().TotalCost)
                 </th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var item in Model.BorrowedHistories)
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Borrower.CardNumber)
+                        @Html.DisplayFor(modelItem => item.Borrower.LibraryCardNumber)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Borrower.Name)

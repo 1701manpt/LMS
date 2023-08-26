@@ -1,168 +1,194 @@
 ﻿using LMS.Models;
+using LMS.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Controllers
 {
     public class BorrowedItemTempsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IBorrowedItemTempService _borrowedItemTempService;
+        private readonly IItemService _itemService;
 
-        public BorrowedItemTempsController(AppDbContext context)
+        public BorrowedItemTempsController(IBorrowedItemTempService borrowedItemTempService, IItemService itemService)
         {
-            _context = context;
+            _borrowedItemTempService = borrowedItemTempService;
+            _itemService = itemService;
         }
 
         // GET: BorrowedItemTemps/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
-            if (id == null || _context.BorrowedItemTemps == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var borrowedItemTemp = await _context.BorrowedItemTemps
-                .Include(bit => bit.Item)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (borrowedItemTemp == null)
+                var borrowedItemTemp = _borrowedItemTempService.Details((int)id);
+                if (borrowedItemTemp == null)
+                {
+                    return NotFound();
+                }
+
+                return View(borrowedItemTemp);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return View(borrowedItemTemp);
         }
 
         // GET: BorrowedItemTemps/Create
         public IActionResult Create()
         {
-            var itemSelectList = _context.Items
-            .Select(b => new
+            try
             {
-                Value = b.Id,
-                Text = $"{b.Title} - {b.Type}"
-            });
-            ViewData["ItemId"] = new SelectList(itemSelectList, "Value", "Text");
-            return View();
+                var itemSelectList = _itemService.Index()
+                    .Select(b => new
+                    {
+                        Value = b.Id,
+                        Text = $"{b.Title} - {b.Type}"
+                    });
+
+                ViewData["ItemId"] = new SelectList(itemSelectList, "Value", "Text");
+                return View();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // POST: BorrowedItemTemps/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ItemId,Quantity")] BorrowedItemTemp borrowedItemTemp)
+        public IActionResult Create([Bind("Id,ItemId,Quantity")] BorrowedItemTemp borrowedItemTemp)
         {
-            var item = await _context.Items.FirstOrDefaultAsync(_ => _.Id == borrowedItemTemp.ItemId);
-            if(item == null)
+            try
             {
-                return NotFound();
+                var itemSelectList = _itemService.Index()
+                .Select(b => new
+                {
+                    Value = b.Id,
+                    Text = $"{b.Title} - {b.Type}"
+                });
+                ViewData["ItemId"] = new SelectList(itemSelectList, "Value", "Text");
+
+                if (ModelState.IsValid)
+                {
+                    _borrowedItemTempService.Create(borrowedItemTemp);
+
+                    return RedirectToAction("Create", "BorrowedHistories");
+                }
+                return View(borrowedItemTemp);
             }
-            if (ModelState.IsValid)
+            catch (Exception ex)
             {
-                _context.Add(borrowedItemTemp);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Create", "BorrowedHistories");
+                return BadRequest(ex.Message);
             }
-            return View(borrowedItemTemp);
         }
 
         // GET: BorrowedItemTemps/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
-            if (id == null || _context.BorrowedItemTemps == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var borrowedItemTemp = await _context.BorrowedItemTemps.FindAsync(id);
-            if (borrowedItemTemp == null)
+                if (!_borrowedItemTempService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var borrowedItemTemp = _borrowedItemTempService.Details((int)id);
+
+                ViewData["ItemId"] = new SelectList(_itemService.Index(), "Id", "Title", borrowedItemTemp.ItemId);
+
+                return View(borrowedItemTemp);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            ViewData["ItemId"] = new SelectList(_context.Items, "Id", "Title", borrowedItemTemp.ItemId);
-
-            return View(borrowedItemTemp);
         }
 
         // POST: BorrowedItemTemps/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ItemId,Quantity,Cost")] BorrowedItemTemp borrowedItemTemp)
+        public IActionResult Edit(int id, [Bind("Id,ItemId,Quantity,Cost")] BorrowedItemTemp borrowedItemTemp)
         {
-            if (id != borrowedItemTemp.Id)
+            try
             {
-                return NotFound();
-            }
+                if (id != borrowedItemTemp.Id)
+                {
+                    return NotFound();
+                }
 
-            borrowedItemTemp.Cost = borrowedItemTemp.Quantity * _context.Items.Find(borrowedItemTemp.ItemId).Price;
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(borrowedItemTemp);
-                    await _context.SaveChangesAsync();
+                    _borrowedItemTempService.Edit(borrowedItemTemp);
+
+                    return RedirectToAction("Create", "BorrowedHistories");
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BorrowedItemTempExists(borrowedItemTemp.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction("Details", new { Id = borrowedItemTemp.Id });
+                return View(borrowedItemTemp);
             }
-            return View(borrowedItemTemp);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // GET: BorrowedItemTemps/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
-            if (id == null || _context.BorrowedItemTemps == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
 
-            var borrowedItemTemp = await _context.BorrowedItemTemps
-                .Include(bit => bit.Item)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (borrowedItemTemp == null)
+                if (!_borrowedItemTempService.Exist((int)id))
+                {
+                    return NotFound();
+                }
+
+                var borrowedItemTemp = _borrowedItemTempService.Details((int)id);
+
+                return View(borrowedItemTemp);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                return BadRequest(ex.Message);
             }
-
-            return View(borrowedItemTemp);
         }
 
         // POST: BorrowedItemTemps/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            if (_context.BorrowedItemTemps == null)
+            try
             {
-                return Problem("Entity set 'AppDbContext.BorrowedItemTemp'  is null.");
+                _borrowedItemTempService.Delete(id);
+
+                return RedirectToAction("Create", "BorrowedHistories");
             }
-            var borrowedItemTemp = await _context.BorrowedItemTemps.FindAsync(id);
-            if (borrowedItemTemp != null)
+            catch (Exception ex)
             {
-                _context.BorrowedItemTemps.Remove(borrowedItemTemp);
+                return BadRequest(ex.Message);
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Create", "BorrowedHistories");
-        }
-
-        private bool BorrowedItemTempExists(int id)
-        {
-            return (_context.BorrowedItemTemps?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

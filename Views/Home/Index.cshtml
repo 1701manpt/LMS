@@ -1,8 +1,39 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<LMS.Models.Item>;
+
+@{
+    ViewBag.Title = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-2 g-lg-3">
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <div class="card text-dark bg-light">
+                @* <img src="..." class="card-img-top" alt="..."> *@
+                <div class="card-header">
+                    <h5 class="card-title">
+                        @Html.DisplayFor(_ => item.Type)
+                    </h5>
+                    <p class="card-text">
+                        <h4>@Html.DisplayFor(_ => item.Title)</h4>
+                    </p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        @Html.DisplayNameFor(_ => _.Author): @Html.DisplayFor(_ => item.Author)
+                    </li>
+                    <li class="list-group-item">
+                        @Html.DisplayNameFor(_ => _.PublicationDate): @Html.DisplayFor(_ => item.PublicationDate)
+                    </li>
+                    <li class="list-group-item">
+                        @Html.DisplayNameFor(_ => _.Price): @Html.DisplayFor(_ => item.Price)
+                    </li>
+                </ul>
+                <div class="card-body">
+                    <a href="#" class="btn btn-sm btn-outline-primary">Details</a>
+                    <a asp-action="Create" asp-controller="CartItemTemps" asp-route-itemId="@item.Id" class="btn btn-sm btn-success">Add Cart</a>
+                </div>
+            </div>
+        </div>
+    }
 </div>

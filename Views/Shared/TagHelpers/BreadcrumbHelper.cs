@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace LMS.TagHelpers
+namespace LMS.Views.Shared.TagHelpers
 {
     public static class BreadcrumbHelper
     {
@@ -46,11 +47,11 @@ namespace LMS.TagHelpers
 
                 if (i == 0)
                 {
-                    breadcrumb.AppendFormat("<li class=\"breadcrumb-item\"><a class=\"text-decoration-none\" href=\"/{0}\">{1}</a></li>", breadcrumbItem.ToLower(), AddSpacesToCamelCase(breadcrumbItem));
+                    breadcrumb.AppendFormat("<li class=\"breadcrumb-item\"><a class=\"text-decoration-none\" href=\"/{0}\">{1}</a></li>", Transform(breadcrumbItem), AddSpacesToCamelCase(breadcrumbItem));
                 }
                 else
                 {
-                    breadcrumb.AppendFormat("<li class=\"breadcrumb-item\">{0}</li>", breadcrumbItem);
+                    breadcrumb.AppendFormat("<li class=\"breadcrumb-item\">{0}</li>", AddSpacesToCamelCase(breadcrumbItem));
                 }
             }
 
@@ -61,7 +62,19 @@ namespace LMS.TagHelpers
 
         private static string AddSpacesToCamelCase(string input)
         {
+            input = char.ToUpper(input[0]) + input.Substring(1); // Chuyển kí tự đầu tiên thành in hoa
             return Regex.Replace(input, "(?<=[a-z])([A-Z])", " $1", RegexOptions.Compiled).Trim();
+        }
+
+        private static string Transform(string input)
+        {
+            return Regex.Replace(
+                 input.ToString()!,
+                     "([a-z])([A-Z])",
+                 "$1-$2",
+                 RegexOptions.CultureInvariant,
+                 TimeSpan.FromMilliseconds(100))
+                 .ToLowerInvariant();
         }
     }
 }
