@@ -1,10 +1,14 @@
 using LMS;
+using LMS.Models;
 using LMS.Repositories;
 using LMS.Repositories.Interfaces;
 using LMS.Services;
 using LMS.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("vi-VN");
 
@@ -21,7 +25,13 @@ app.Run();
 
 static void ConfigureServices(IServiceCollection services, WebApplicationBuilder? builder)
 {
-    services.AddControllersWithViews();
+    services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.PropertyNamingPolicy = null; // prevent camel case
+    });
     services.AddRouting(options =>
     {
         options.LowercaseUrls = true;
@@ -41,9 +51,6 @@ static void ConfigureServices(IServiceCollection services, WebApplicationBuilder
     services.AddScoped<IBorrowedHistoryRepository, BorrowedHistoryRepository>();
     services.AddScoped<IBorrowedItemRepository, BorrowedItemRepository>();
     services.AddScoped<IBorrowedItemTempRepository, BorrowedItemTempRepository>();
-    services.AddScoped<ICartRepository, CartRepository>();
-    services.AddScoped<ICartItemRepository, CartItemRepository>();
-    services.AddScoped<ICartItemTempRepository, CartItemTempRepository>();
 
     // add services
     services.AddScoped<IItemService, ItemService>();
@@ -54,9 +61,10 @@ static void ConfigureServices(IServiceCollection services, WebApplicationBuilder
     services.AddScoped<IBorrowedHistoryService, BorrowedHistoryService>();
     services.AddScoped<IBorrowedItemService, BorrowedItemService>();
     services.AddScoped<IBorrowedItemTempService, BorrowedItemTempService>();
-    services.AddScoped<ICartService, CartService>();
-    services.AddScoped<ICartItemService, CartItemService>();
-    services.AddScoped<ICartItemTempService, CartItemTempService>();
+
+    services.AddHttpContextAccessor();
+    services.AddSession();
+    services.AddScoped<SessionManager>();
 }
 
 static void Configure(IApplicationBuilder app, bool isEnv)
@@ -71,4 +79,5 @@ static void Configure(IApplicationBuilder app, bool isEnv)
     app.UseStaticFiles();
     app.UseRouting();
     app.UseAuthorization();
+    app.UseSession();
 }

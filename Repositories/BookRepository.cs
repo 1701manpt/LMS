@@ -27,13 +27,12 @@ namespace LMS.Repositories
             }
         }
 
-        public List<Book> GetAll()
+        public IEnumerable<Book> GetAll()
         {
             try
             {
                 return _context.Books
-                    .Include(_ => _.BorrowedItems)
-                    .ToList();
+                    .Include(_ => _.BorrowedItems);
             }
             catch (Exception ex)
             {
@@ -74,18 +73,6 @@ namespace LMS.Repositories
                 var book = _context.Books.First(_ => _.Id == id);
                 _context.Books.Remove(book);
                 _context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public void DetachedState(Book book)
-        {
-            try
-            {
-                _context.Entry(book).State = EntityState.Detached;
             }
             catch (Exception ex)
             {

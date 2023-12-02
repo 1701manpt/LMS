@@ -8,11 +8,13 @@ namespace LMS.Services
     {
         private readonly IBorrowedItemTempRepository _borrowedItemTempRepository;
         private readonly IItemRepository _itemRepository;
+        private readonly IItemService _itemService;
 
-        public BorrowedItemTempService(IBorrowedItemTempRepository borrowedItemTempRepository, IItemRepository itemRepository)
+        public BorrowedItemTempService(IBorrowedItemTempRepository borrowedItemTempRepository, IItemRepository itemRepository, IItemService itemService)
         {
             _borrowedItemTempRepository = borrowedItemTempRepository;
             _itemRepository = itemRepository;
+            _itemService = itemService;
         }
 
         public List<BorrowedItemTemp> Index()
@@ -36,24 +38,28 @@ namespace LMS.Services
         public BorrowedItemTemp Create(BorrowedItemTemp borrowedItemTemp)
         {
             var checkItemExistInTempList = _borrowedItemTempRepository.GetByField(bit => bit.ItemId == borrowedItemTemp.ItemId);
+            
             if (checkItemExistInTempList != null)
             {
                 throw new Exception("Item already added to the borrowing list.");
             }
 
             var item = _itemRepository.GetById(borrowedItemTemp.ItemId);
-            if (borrowedItemTemp.Quantity > item.AvailableQuantity)
-            {
-                throw new Exception("Quantity exceeds available quantity.");
-            }
 
+            // check quantity > available quantity?
+            _itemService.CheckAvailableQuantity(item.Id, borrowedItemTemp.Quantity);
+
+
+            // add borrowedItemTem
             _borrowedItemTempRepository.Add(borrowedItemTemp);
 
-            // update available quantity of item
-            item.AvailableQuantity -= borrowedItemTemp.Quantity;
-            _itemRepository.Update(item);
+            // difference amount
+            int quantity = 0 - borrowedItemTemp.Quantity;
 
-            return _borrowedItemTempRepository.GetById(borrowedItemTemp.Id);
+            // update available quantity
+            _itemService.UpdateAvailableQuantity(item.Id, quantity);
+
+            return borrowedItemTemp;
         }
 
         public BorrowedItemTemp Edit(BorrowedItemTemp borrowedItemTemp)
@@ -61,24 +67,24 @@ namespace LMS.Services
             try
             {
                 var item = _itemRepository.GetById(borrowedItemTemp.ItemId);
-                var borrowedItemTempOld = _borrowedItemTempRepository.GetById(borrowedItemTemp.Id);
+                var borrowedItemTempCurrent = _borrowedItemTempRepository.GetById(borrowedItemTemp.Id);
 
-                if (borrowedItemTemp.Quantity > item.AvailableQuantity + borrowedItemTempOld.Quantity)
-                {
-                    throw new Exception("Quantity exceeds available quantity.");
-                }
+                // check quantity > available quantity?
+                _itemService.CheckAvailableQuantity(item.Id, borrowedItemTemp.Quantity);
 
-                _borrowedItemTempRepository.DetachedState(borrowedItemTempOld);
+                // difference amount
+                int quantity = borrowedItemTempCurrent.Quantity - borrowedItemTemp.Quantity;
 
-                _borrowedItemTempRepository.Update(borrowedItemTemp);
+                // update borrowedItemTemp
+                borrowedItemTempCurrent.Quantity = borrowedItemTemp.Quantity;
+                borrowedItemTempCurrent.Cost = borrowedItemTemp.Cost;
 
-                // update available quantity of item after edit quantity borrow
-                item.AvailableQuantity += borrowedItemTempOld.Quantity;
-                item.AvailableQuantity -= borrowedItemTemp.Quantity;
+                // update available quantity
+                _itemService.UpdateAvailableQuantity(item.Id, quantity);
 
-                _itemRepository.Update(item);
+                _borrowedItemTempRepository.Update(borrowedItemTempCurrent);
 
-                return _borrowedItemTempRepository.GetById(borrowedItemTemp.Id);
+                return borrowedItemTempCurrent;
             }
             catch (Exception ex)
             {
@@ -95,10 +101,11 @@ namespace LMS.Services
 
                 _borrowedItemTempRepository.Delete(id);
 
-                // update available quantity of item after delete borrow item
-                item.AvailableQuantity += borrowedItemTemp.Quantity;
+                // difference amount
+                int quantity = borrowedItemTemp.Quantity;
 
-                _itemRepository.Update(item);
+                // update available quantity
+                _itemService.UpdateAvailableQuantity(item.Id, quantity);
 
                 return true;
             }

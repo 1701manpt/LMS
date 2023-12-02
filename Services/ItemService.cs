@@ -1,18 +1,18 @@
 ﻿using LMS.Models;
-using LMS.Repositories;
 using LMS.Repositories.Interfaces;
 using LMS.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Services
 {
-    public class ItemService: IItemService
+    public class ItemService : IItemService
     {
         private readonly IItemRepository _itemRepository;
+        private readonly IBorrowedItemRepository _borrowedItemRepository;
 
-        public ItemService(IItemRepository itemRepository)
+        public ItemService(IItemRepository itemRepository, IBorrowedItemRepository borrowedItemRepository)
         {
             _itemRepository = itemRepository;
+            _borrowedItemRepository = borrowedItemRepository;
         }
 
         public List<Item> Index()
@@ -20,12 +20,47 @@ namespace LMS.Services
             return _itemRepository.GetAll().ToList();
         }
 
-        public List<Item> Search(string title)
+        public List<Item> GetByPage(int pageNumber, int pageSize, string? title)
         {
-            return _itemRepository
-                .GetAll()
-                .Where(_ => _.Title.ToLower().Contains(title))
-                .ToList();
+            try
+            {
+                var items = _itemRepository.GetAll();
+
+                if (title != null)
+                {
+                    items = items.Where(_ => _.Title.ToLower().Contains(title));
+                }
+
+                return items
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public int CountPage(int pageSize, string? title)
+        {
+            try
+            {
+                var items = _itemRepository.GetAll();
+
+                if (title != null)
+                {
+                    items = items.Where(_ => _.Title.ToLower().Contains(title));
+                }
+
+                int totalItems = items.Count();
+                int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+                return totalPages;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public Item Details(int id)
@@ -67,6 +102,39 @@ namespace LMS.Services
                 return false;
             }
             return true;
+        }
+
+        public void UpdateAvailableQuantity(int id, int quantity)
+        {
+            try
+            {
+                var item = _itemRepository.GetById(id);
+
+                item.AvailableQuantity += quantity;
+
+                _itemRepository.Update(item);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public void CheckAvailableQuantity(int id, int quantity)
+        {
+            try
+            {
+                var item = _itemRepository.GetById(id);
+
+                if (quantity > item.AvailableQuantity)
+                {
+                    throw new Exception("Quantity exceeds available quantity.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

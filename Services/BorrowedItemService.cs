@@ -1,6 +1,7 @@
 ﻿using LMS.Services.Interfaces;
 using LMS.Repositories.Interfaces;
 using LMS.Models;
+using NuGet.Packaging;
 
 namespace LMS.Services
 {
@@ -8,11 +9,15 @@ namespace LMS.Services
     {
         private readonly IBorrowedItemRepository _borrowedItemRepository;
         private readonly IBorrowedItemTempRepository _borrowedItemTempRepository;
+        private readonly IBorrowedHistoryService _borrowedHistoryService;
+        private readonly IItemService _itemService;
 
-        public BorrowedItemService(IBorrowedItemRepository borrowedItemRepository, IBorrowedItemTempRepository borrowedItemTempRepository)
+        public BorrowedItemService(IBorrowedItemRepository borrowedItemRepository, IBorrowedItemTempRepository borrowedItemTempRepository, IBorrowedHistoryService borrowedHistoryService, IItemService itemService)
         {
             _borrowedItemRepository = borrowedItemRepository;
             _borrowedItemTempRepository = borrowedItemTempRepository;
+            _borrowedHistoryService = borrowedHistoryService;
+            _itemService = itemService;
         }
 
         public List<BorrowedItem> Index()
@@ -53,6 +58,7 @@ namespace LMS.Services
                     {
                         ItemId = borrowedItemTemp.ItemId,
                         Quantity = borrowedItemTemp.Quantity,
+                        ReturnedQuantity = 0,
                         Cost = borrowedItemTemp.Quantity * borrowedItemTemp.Item.Price,
                         BorrowedHistoryId = borrowedHistoryId
                     };
@@ -65,6 +71,28 @@ namespace LMS.Services
             catch (Exception ex)
             {
 
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public void Return(int id)
+        {
+            try
+            {
+                var borrowedItem = _borrowedItemRepository.GetById(id);
+
+                borrowedItem.ReturnedQuantity = borrowedItem.Quantity;
+
+                _borrowedItemRepository.Update(borrowedItem);
+
+                // update borrowed state history if all borrowed items have return quantity = quantity
+                _borrowedHistoryService.UpdateBorrowedState(borrowedItem.BorrowedHistoryId);
+
+                // update available quantity item
+                _itemService.UpdateAvailableQuantity(borrowedItem.ItemId, borrowedItem.Quantity);
+            }
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message);
             }
         }
@@ -95,6 +123,22 @@ namespace LMS.Services
             catch (Exception ex)
             {
 
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public bool Exist(int id)
+        {
+            try
+            {
+                if (_borrowedItemRepository.GetById(id) == null)
+                {
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message);
             }
         }

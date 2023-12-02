@@ -4,12 +4,14 @@
     ViewData["Title"] = "Index";
 }
 
-<div class="d-flex justify-content-end">
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
-</div>
+<a asp-action="Create" class="btn btn-primary">
+    <i class="bi bi-plus-square"></i>
+    <span class="ms-1">Create</span>
+</a>
 <div class="table-responsive">
-    <table class="table text-center">
-        <thead>
+    <table class="table align-middle text-center caption-top table-bordered">
+        <caption>List of dvds</caption>
+        <thead class="table-light">
             <tr>
                 <th>
                     @Html.DisplayNameFor(model => model.Type)
@@ -67,17 +69,14 @@
                         @Html.DisplayFor(modelItem => item.AvailableQuantity)
                     </td>
                     <td>
-                        <div class="float-end btn-group btn-group-sm gap-2">
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info">
-                                <i class="bi bi-info-square"></i>
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">
-                                <i class="bi bi-x-square"></i>
-                            </a>
-                        </div>
+                        @await Html.PartialAsync("~/Views/Shared/PartialViews/_ControlBtnPartial.cshtml",
+                            new ControlBtnPartialViewModel {
+                                Id = item.Id,
+                                Edit = true,
+                                Details = true,
+                                Delete = true
+                            }
+                        )
                     </td>
                 </tr>
             }

@@ -17,7 +17,5 @@ namespace LMS.Models
         public required string LibraryCardNumber { get; set; }
 
         public List<BorrowedHistory>? BorrowedHistories { get; set; }
-        public List<Cart>? Carts { get; set; }
-        public List<CartItemTemp>? CartItemTemp { get; set; }
     }
 }

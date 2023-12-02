@@ -17,7 +17,37 @@ namespace LMS.Services
         {
             try
             {
-                return _bookRepository.GetAll();
+                return _bookRepository.GetAll()
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public List<Book> GetByPage(int pageNumber, int pageSize)
+        {
+            try
+            {
+                return _bookRepository.GetAll()
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public int CountPage(int pageSize)
+        {
+            try
+            {
+                int totalItems = _bookRepository.GetAll().Count();
+                int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+                return totalPages;
             }
             catch (Exception ex)
             {
@@ -60,12 +90,13 @@ namespace LMS.Services
                 var bookOld = _bookRepository.GetById(book.Id);
 
                 // Preserve data integrity by assigning information from bookOld to book
-                book.Quantity = bookOld.Quantity;
-                book.AvailableQuantity = bookOld.AvailableQuantity;
+                bookOld.Author = book.Author;
+                bookOld.NumberOfPages = book.NumberOfPages;
+                bookOld.PublicationDate = book.PublicationDate;
+                bookOld.Price = book.Price;
+                bookOld.Title= book.Title;
 
-                _bookRepository.DetachedState(bookOld);
-
-                _bookRepository.Update(book);
+                _bookRepository.Update(bookOld);
 
                 return _bookRepository.GetById(book.Id);
             }

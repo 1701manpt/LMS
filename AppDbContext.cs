@@ -14,9 +14,6 @@ public class AppDbContext : DbContext
     public DbSet<BorrowedHistory> BorrowedHistories { get; set; }
     public DbSet<BorrowedItem> BorrowedItems { get; set; }
     public DbSet<BorrowedItemTemp> BorrowedItemTemps { get; set; }
-    public DbSet<Cart> Carts { get; set; }
-    public DbSet<CartItem> CartItems { get; set; }
-    public DbSet<CartItemTemp> CartItemTemps { get; set; }
     public DbSet<Account> Accounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -49,30 +46,5 @@ public class AppDbContext : DbContext
             .HasOne(bit => bit.Item) // Một BorrowedItemTemp có một Item
             .WithMany(i => i.BorrowedItemTemps) // Một Item có nhiều BorrowedItemTemp
             .HasForeignKey(bi => bi.ItemId); // Khóa ngoại ItemId
-
-        modelBuilder.Entity<Cart>()
-            .HasOne(c => c.Borrower) // Một Cart có một Borrower
-            .WithMany(b => b.Carts) // Một Borrower có nhiều BorrowedItemTemp
-            .HasForeignKey(c => c.BorrowerId); // Khóa ngoại BorrowerId
-
-        modelBuilder.Entity<CartItem>()
-            .HasOne(ci => ci.Cart) // Một CartItem có một Cart
-            .WithMany(c => c.CartItems) // Một Cart có nhiều CartItem
-            .HasForeignKey(ci => ci.CartId); // Khóa ngoại CartId
-
-        modelBuilder.Entity<CartItem>()
-            .HasOne(ci => ci.Item) // Một CartItem có một Item
-            .WithMany(c => c.CartItems) // Một Item có nhiều CartItem
-            .HasForeignKey(ci => ci.ItemId); // Khóa ngoại CartId
-
-        modelBuilder.Entity<CartItemTemp>()
-            .HasOne(cit => cit.Item) // Một CartItemTemp có một Item
-            .WithMany(i => i.CartItemTemps) // Một Item có nhiều CartItemTemp
-            .HasForeignKey(bi => bi.ItemId); // Khóa ngoại ItemId
-
-        modelBuilder.Entity<CartItemTemp>()
-            .HasOne(cit => cit.Borrower) // Một CartItemTemp có một Borrower
-            .WithMany(i => i.CartItemTemp) // Một Borrower có nhiều CartItemTemp
-            .HasForeignKey(bi => bi.BorrowerId); // Khóa ngoại BorrowerId
     }
 }

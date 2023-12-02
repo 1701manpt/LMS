@@ -1,9 +1,11 @@
 ﻿using LMS.Models;
 using LMS.Services.Interfaces;
+using LMS.ViewModels.BorrowedHistories;
+using LMS.Views.Shared.PartialViews;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using LMS.ViewModels.BorrowedHistories;
-using System.Runtime.InteropServices;
+using System;
+using System.Globalization;
 
 namespace LMS.Controllers
 {
@@ -23,7 +25,8 @@ namespace LMS.Controllers
         }
 
         // GET: BorrowedHistories
-        public IActionResult Index(int? borrowerId, int? itemId, DateTime? startDate, DateTime? endDate, BorrowedState? borrowedState)
+        [HttpGet]
+        public IActionResult Index(int? pageNumber, int? pageSize, int? borrowerId, int? itemId, DateTime? startDate, DateTime? endDate, BorrowedState? borrowedState)
         {
             try
             {
@@ -34,33 +37,73 @@ namespace LMS.Controllers
                     ItemSelectList = new SelectList(_itemService.Index(), "Id", "Title"),
                 };
 
-                if (borrowerId != null || itemId != null || startDate != null || endDate != null || borrowedState != null)
+                var borrowedHitoriesQuery = _borrowedHistoryService.GetAll();
+
+                //if (borrowerId != null || itemId != null || startDate != null || endDate != null || borrowedState != null)
+                //{
+                    borrowedHitoriesQuery = _borrowedHistoryService.Search
+                        (
+                            borrowedHitoriesQuery,
+                            borrowerId,
+                            itemId,
+                            startDate,
+                            endDate,
+                            borrowedState
+                        );
+                //}
+
+                if (!pageNumber.HasValue)
                 {
-                    indexViewModel.BorrowedHistories = _borrowedHistoryService.Search(borrowerId, itemId, startDate, endDate, borrowedState);
+                    pageNumber = 1;
                 }
 
-                if (startDate != null)
+                if (!pageSize.HasValue)
                 {
-                    indexViewModel.StartDate = (DateTime)startDate;
+                    pageSize = 2;
                 }
 
-                if (endDate != null)
+                PaginationPartialViewModel pagination = new PaginationPartialViewModel
                 {
-                    indexViewModel.EndDate = (DateTime)endDate;
+                    PageSize = (int)pageSize,
+                    CurrentPage = (int)pageNumber,
+                    TotalPages = _borrowedHistoryService.CountPage(borrowedHitoriesQuery, (int)pageSize)
+                };
+
+                ViewData["BorrowerId"] = borrowerId;
+                ViewData["ItemId"] = itemId;
+                ViewData["BorrowedState"] = borrowedState;
+                ViewData["StartDate"] = startDate?.ToString("yyyy-MM-dd");
+                ViewData["EndDate"] = endDate?.ToString("yyyy-MM-dd");
+
+                indexViewModel.PaginationPartialViewModel = pagination;
+
+                borrowedHitoriesQuery = _borrowedHistoryService.Pagination(borrowedHitoriesQuery, (int)pageNumber, (int)pageSize);
+
+                indexViewModel.BorrowedHistories = borrowedHitoriesQuery.ToList();
+
+                if (!startDate.HasValue)
+                {
+                    indexViewModel.StartDate = startDate?.ToString("yyyy-MM-dd");
+                }
+
+                if (!endDate.HasValue)
+                {
+                    indexViewModel.EndDate = endDate?.ToString("yyyy-MM-dd");
                 }
 
                 var borrowedStateValues = Enum.GetValues(typeof(BorrowedState));
-                var stateSelectList = new List<SelectListItem>();
+                var borrowedStates = new List<SelectListItem>();
+
                 for (int i = 0; i < borrowedStateValues.Length; i++)
                 {
-                    stateSelectList.Add(new SelectListItem
+                    borrowedStates.Add(new SelectListItem
                     {
                         Value = i.ToString(),
                         Text = borrowedStateValues.GetValue(i).ToString()
                     });
                 }
 
-                indexViewModel.StateSelectList = stateSelectList;
+                indexViewModel.StateSelectList = new SelectList(borrowedStates, "Value", "Text");
 
                 return View(indexViewModel);
             }
@@ -108,43 +151,29 @@ namespace LMS.Controllers
             }
         }
 
-        [HttpPost]
-        public IActionResult SearchBorrowers()
-        {
-            try
-            {
-                return Redirect("Create");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
         // GET: BorrowedHistories/Create
         public IActionResult Create()
         {
             try
             {
-                var borrowerSelectList = _borrowerService.Index()
+                CreateViewModel createViewModel = new CreateViewModel
+                {
+                    BorrowedDate = DateTime.Now.ToString("dd-MM-yyyy"),
+                    TotalCost = _borrowedHistoryService.CalcTotalCost().ToString("C"),
+                };
+
+                var borrowers = _borrowerService.Index()
                    .Select(b => new
                    {
                        Value = b.Id,
                        Text = $"{b.LibraryCardNumber} - {b.Name}"
                    });
-                ViewData["BorrowerId"] = new SelectList(borrowerSelectList, "Value", "Text");
-                string currentDate = DateTime.Now.ToString("dd-MM-yyyy");
-                ViewData["BorrowedDate"] = currentDate;
 
-                var borrowedItemTempList = _borrowedItemTempService.Index();
+                createViewModel.BorrowerSelectList = new SelectList(borrowers, "Value", "Text");
 
-                ViewData["BorrowedItemTemps"] = borrowedItemTempList;
+                createViewModel.BorrowedItemTemps = _borrowedItemTempService.Index();
 
-                decimal totalCost = _borrowedHistoryService.CalcTotalCost();
-
-                ViewData["TotalCost"] = totalCost.ToString("F0");
-
-                return View();
+                return View(createViewModel);
             }
             catch (Exception ex)
             {
@@ -158,17 +187,34 @@ namespace LMS.Controllers
         [HttpPost]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id,BorrowerId,BorrowedDate,TotalCost")] BorrowedHistory borrowedHistory)
+        public IActionResult Create([Bind("Id,BorrowerId,BorrowedDate,TotalCost")] CreateViewModel createViewModel)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    var borrowedHistory = new BorrowedHistory
+                    {
+                        BorrowerId = createViewModel.BorrowerId,
+                        BorrowedDate = DateTime.Now,
+                        TotalCost = _borrowedHistoryService.CalcTotalCost()
+                    };
+
                     _borrowedHistoryService.Create(borrowedHistory);
 
-                    return RedirectToAction("Create", "BorrowedItems", new { id = borrowedHistory.Id });
+                    return RedirectToAction("Create", "BorrowedItems", new { borrowedHistoryId = borrowedHistory.Id });
                 }
-                return View();
+
+                var borrowers = _borrowerService.Index()
+                   .Select(b => new
+                   {
+                       Value = b.Id,
+                       Text = $"{b.LibraryCardNumber} - {b.Name}"
+                   });
+
+                createViewModel.BorrowerSelectList = new SelectList(borrowers, "Value", "Text");
+
+                return View(createViewModel);
             }
             catch (Exception ex)
             {

@@ -1,0 +1,40 @@
+﻿@model LMS.Views.Shared.PartialViews.ControlBtnPartialViewModel
+
+<div class="btn-group btn-group-sm gap-1">
+    @{
+        if (Convert.ToBoolean(Model.Edit))
+        {
+            <a asp-action="Edit" asp-controller="@Model.ControllerName" asp-route-id="@Model.Id" class="btn btn-warning text-white" data-bs-toggle="tooltip" title="Edit">
+                <i class="bi bi-pencil-square"></i>
+            </a>
+        }
+
+        if (Convert.ToBoolean(Model.Details))
+        {
+            <a asp-action="Details" asp-controller="@Model.ControllerName" asp-route-id="@Model.Id" class="btn btn-info text-white" data-bs-toggle="tooltip" title="Details">
+                <i class="bi bi-info-square"></i>
+            </a>
+        }
+
+        if (Convert.ToBoolean(Model.Delete))
+        {
+            <a asp-action="Delete" asp-controller="@Model.ControllerName" asp-route-id="@Model.Id" class="btn btn-danger text-white" data-bs-toggle="tooltip" title="Delete">
+                <i class="bi bi-x-square"></i>
+            </a>
+        }
+
+        if(Convert.ToBoolean(Model.Approve))
+        {
+            <a asp-action="" asp-controller="@Model.ControllerName" asp-route-id="@Model.Id" class="btn btn-primary" data-bs-toggle="tooltip" title="Approve">
+                <i class="bi bi-check-square"></i>
+            </a>
+        }
+
+        if (Convert.ToBoolean(Model.Return))
+        {
+            <a asp-action="Return" asp-controller="@Model.ControllerName" asp-route-id="@Model.Id" class="btn btn-primary" data-bs-toggle="tooltip" title="Return">
+                <i class="bi bi-check2-square"></i>
+            </a>
+        }
+    }
+</div>

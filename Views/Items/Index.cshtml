@@ -1,20 +1,21 @@
-﻿@model IEnumerable<LMS.Models.Item>
+﻿@model LMS.ViewModels.Items.IndexViewModel
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<div class="row row-cols-2 g-3 mb-3">
+<div class="row gap-2">
     <div class="col-auto">
-        <a href="#chua-lam" class="btn btn-primary">
+        <a asp-action="Create" class="btn btn-primary">
             <i class="bi bi-plus-square"></i>
-            <span class="ms-1">Chưa làm</span>
+            <span class="ms-1">Create</span>
         </a>
     </div>
+
     <div class="col-auto">
         <form asp-action="Search">
             <div class="input-group">
-                <input type="search" value="@ViewBag.TitleItem" name="title" class="form-control" placeholder="Enter title item">
+                <input type="search" value="@Model.Title" name="title" class="form-control" placeholder="Enter title item">
                 <button type="submit" class="btn btn-info text-white">
                     <i class="bi bi-search"></i>
                 </button>
@@ -22,72 +23,77 @@
         </form>
     </div>
 </div>
+
 <div class="table-responsive">
-    <table class="table text-center">
-        <thead>
+    <table class="table align-middle text-center caption-top table-bordered">
+        <caption>List of items</caption>
+        <thead class="table-light">
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Type)
+                    @Html.DisplayNameFor(model => model.Items.First().Type)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Title)
+                    @Html.DisplayNameFor(model => model.Items.First().Title)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Author)
+                    @Html.DisplayNameFor(model => model.Items.First().Author)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.PublicationDate)
+                    @Html.DisplayNameFor(model => model.Items.First().PublicationDate)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Price)
+                    @Html.DisplayNameFor(model => model.Items.First().Price)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Quantity)
+                    @Html.DisplayNameFor(model => model.Items.First().Quantity)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.AvailableQuantity)
+                    @Html.DisplayNameFor(model => model.Items.First().AvailableQuantity)
                 </th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @if (Model.Items != null)
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Type)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Title)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Author)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.PublicationDate)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Price)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Quantity)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.AvailableQuantity)
-                    </td>
-                    <td>
-                        <div class="float-end btn-group btn-group-sm gap-2">
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info">
-                                <i class="bi bi-info-square"></i>
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">
-                                <i class="bi bi-x-square"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+                foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Type)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Author)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PublicationDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Quantity)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AvailableQuantity)
+                        </td>
+                        <td>
+                            @await Html.PartialAsync("~/Views/Shared/PartialViews/_ControlBtnPartial.cshtml",
+                                new ControlBtnPartialViewModel {
+                                    Id = item.Id,
+                                    ControllerName = "Items",
+                                    Details = true,
+                                    Delete = true
+                                }
+                            )
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 </div>
-
+@await Html.PartialAsync("~/Views/Shared/PartialViews/_PaginationPartial.cshtml", Model.PaginationPartialViewModel)

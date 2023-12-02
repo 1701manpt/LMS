@@ -9,5 +9,7 @@ namespace LMS.Services.Interfaces
         void CreateBorrowedItems(int borrowedHistoryId);
         BorrowedItem Edit(BorrowedItem borrowedItemTemp);
         bool Delete(int id);
+        bool Exist(int id);
+        void Return(int id);
     }
 }

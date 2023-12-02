@@ -11,6 +11,10 @@ namespace LMS.Services.Interfaces
         bool Delete(int id);
         bool Exist(int id);
         decimal CalcTotalCost();
-        List<BorrowedHistory> Search(int? borrowerId, int? itemId, DateTime? startDate, DateTime? endDate, BorrowedState? borrowedState);
+        IQueryable<BorrowedHistory> Search(IQueryable<BorrowedHistory> query, int? borrowerId, int? itemId, DateTime? startDate, DateTime? endDate, BorrowedState? borrowedState);
+        IQueryable<BorrowedHistory> Pagination(IQueryable<BorrowedHistory> query, int pageNumber, int pageSize);
+        IQueryable<BorrowedHistory> GetAll();
+        int CountPage(IQueryable<BorrowedHistory> query, int pageSize);
+        void UpdateBorrowedState(int id);
     }
 }

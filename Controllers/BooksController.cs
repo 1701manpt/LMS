@@ -1,5 +1,7 @@
 ﻿using LMS.Models;
 using LMS.Services.Interfaces;
+using LMS.ViewModels.Books;
+using LMS.Views.Shared.PartialViews;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMS.Controllers
@@ -14,11 +16,34 @@ namespace LMS.Controllers
         }
 
         // GET: Books
-        public IActionResult Index()
+        public IActionResult Index(int? pageNumber, int? pageSize)
         {
             try
             {
-                return View(_bookService.Index());
+                if (!Convert.ToBoolean(pageNumber))
+                {
+                    pageNumber = 1;
+                }
+
+                if (!Convert.ToBoolean(pageSize))
+                {
+                    pageSize = 2;
+                }
+
+                PaginationPartialViewModel pagination = new PaginationPartialViewModel
+                {
+                    TotalPages = _bookService.CountPage((int)pageSize),
+                    CurrentPage = (int)pageNumber,
+                    PageSize = (int)pageSize
+                };
+
+                IndexViewModel indexViewModel = new IndexViewModel
+                {
+                    Books = _bookService.GetByPage((int)pageNumber, (int)pageSize),
+                    PaginationPartialViewModel = pagination
+                };
+
+                return View(indexViewModel);
             }
             catch (Exception ex)
             {

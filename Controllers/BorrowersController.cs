@@ -1,5 +1,7 @@
 ﻿using LMS.Models;
 using LMS.Services.Interfaces;
+using LMS.ViewModels.Borrowers;
+using LMS.Views.Shared.PartialViews;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMS.Controllers
@@ -14,22 +16,95 @@ namespace LMS.Controllers
         }
 
         // GET: Borrowers
-        public IActionResult Index(string? libraryCardNumber)
+        public IActionResult Index(int? pageNumber, int? pageSize, string? libraryCardNumber)
         {
             try
             {
-                if (!string.IsNullOrEmpty(libraryCardNumber))
+                IndexViewModel indexViewModel = new IndexViewModel();
+
+                var borrowersQuery = _borrowerService.GetAll();
+
+                if(!string.IsNullOrEmpty(libraryCardNumber))
                 {
+                    indexViewModel.LibraryCardNumber = libraryCardNumber;
                     ViewData["LibraryCardNumber"] = libraryCardNumber;
-                    return View(_borrowerService.Search(libraryCardNumber));
+                    borrowersQuery = _borrowerService.Search(borrowersQuery, libraryCardNumber);
                 }
 
+                if (!Convert.ToBoolean(pageNumber))
+                {
+                    pageNumber = 1;
+                }
 
-                return View(_borrowerService.Index());
+                if (!Convert.ToBoolean(pageSize))
+                {
+                    pageSize = 2;
+                }
+
+                PaginationPartialViewModel pagination = new PaginationPartialViewModel
+                {
+                    PageSize = (int)pageSize,
+                    CurrentPage = (int)pageNumber,
+                    TotalPages = _borrowerService.CountPage(borrowersQuery, (int)pageSize)
+                };
+
+                indexViewModel.PaginationPartialViewModel = pagination;
+
+                borrowersQuery = _borrowerService.Pagination(borrowersQuery, (int)pageNumber, (int)pageSize);
+
+                indexViewModel.Borrowers = borrowersQuery.ToList();
+
+                return View(indexViewModel);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        public JsonResult List(int? pageNumber, int? pageSize, string? libraryCardNumber)
+        {
+            try
+            {
+                IndexViewModel indexViewModel = new IndexViewModel();
+
+                var borrowersQuery = _borrowerService.GetAll();
+
+                if (!string.IsNullOrEmpty(libraryCardNumber))
+                {
+                    indexViewModel.LibraryCardNumber = libraryCardNumber;
+                    ViewData["LibraryCardNumber"] = libraryCardNumber;
+                    borrowersQuery = _borrowerService.Search(borrowersQuery, libraryCardNumber);
+                }
+
+                if (!Convert.ToBoolean(pageNumber))
+                {
+                    pageNumber = 1;
+                }
+
+                if (!Convert.ToBoolean(pageSize))
+                {
+                    pageSize = 2;
+                }
+
+                PaginationPartialViewModel pagination = new PaginationPartialViewModel
+                {
+                    PageSize = (int)pageSize,
+                    CurrentPage = (int)pageNumber,
+                    TotalPages = _borrowerService.CountPage(borrowersQuery, (int)pageSize)
+                };
+
+                indexViewModel.PaginationPartialViewModel = pagination;
+
+                borrowersQuery = _borrowerService.Pagination(borrowersQuery, (int)pageNumber, (int)pageSize);
+
+                indexViewModel.Borrowers = borrowersQuery.ToList();
+
+                return Json(indexViewModel.Borrowers);
+            }
+            catch(Exception ex)
+            {
+                return Json(BadRequest(ex));
             }
         }
 
@@ -54,13 +129,36 @@ namespace LMS.Controllers
                     return NotFound();
                 }
 
-                var borrower = _borrowerService.Details((int)id);
-
-                return View(borrower);
+                return View();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public JsonResult DetailsJson(int? id)
+        {
+            try
+            {
+                if (id == null)
+                {
+                    return Json(NotFound());
+                }
+
+                if (!_borrowerService.Exist((int)id))
+                {
+                    return Json(NotFound());
+                }
+
+                var borrower = _borrowerService.Details((int)id);
+               
+                return Json(borrower);
+            }
+            catch (Exception ex)
+            {
+                return Json(BadRequest(ex.Message));
             }
         }
 
@@ -71,7 +169,7 @@ namespace LMS.Controllers
             {
                 return View();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -142,7 +240,8 @@ namespace LMS.Controllers
 
                 return View(borrower);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
             }
         }

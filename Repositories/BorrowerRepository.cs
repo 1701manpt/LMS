@@ -27,7 +27,7 @@ namespace LMS.Repositories
             }
         }
 
-        public IEnumerable<Borrower> GetAll()
+        public IQueryable<Borrower> GetAll()
         {
             try
             {

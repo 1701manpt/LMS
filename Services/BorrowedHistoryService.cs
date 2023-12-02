@@ -1,7 +1,6 @@
 ﻿using LMS.Models;
 using LMS.Repositories.Interfaces;
 using LMS.Services.Interfaces;
-using NuGet.Versioning;
 
 namespace LMS.Services
 {
@@ -9,13 +8,13 @@ namespace LMS.Services
     {
         private readonly IBorrowedHistoryRepository _borrowedHistoryRepository;
         private readonly IBorrowedItemTempRepository _borrowedItemTempRepository;
-        private readonly IItemRepository _itemRepository;
+        private readonly IItemService _itemService;
 
-        public BorrowedHistoryService(IBorrowedHistoryRepository borrowedHistoryRepository, IBorrowedItemTempRepository borrowedItemTempRepository,IItemRepository itemRepository)
+        public BorrowedHistoryService(IBorrowedHistoryRepository borrowedHistoryRepository, IBorrowedItemTempRepository borrowedItemTempRepository,IItemService itemService)
         {
             _borrowedHistoryRepository = borrowedHistoryRepository;
             _borrowedItemTempRepository = borrowedItemTempRepository;
-            _itemRepository = itemRepository;
+            _itemService = itemService;
         }
 
         public List<BorrowedHistory> Index()
@@ -30,13 +29,32 @@ namespace LMS.Services
             }
         }
 
-        public List<BorrowedHistory> Search(int? borrowerId, int? itemId, DateTime? startDate, DateTime? endDate, BorrowedState? borrowedState)
+        public IQueryable<BorrowedHistory> GetAll()
+        {
+            return _borrowedHistoryRepository.GetAll();
+        }
+
+        public IQueryable<BorrowedHistory> Pagination(IQueryable<BorrowedHistory> query,int pageNumber, int pageSize)
         {
             try
             {
-                var borrowedHistories = _borrowedHistoryRepository.GetAll();
-                
-                if(borrowerId != null)
+                return query
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public IQueryable<BorrowedHistory> Search(IQueryable<BorrowedHistory> query, int? borrowerId, int? itemId, DateTime? startDate, DateTime? endDate, BorrowedState? borrowedState)
+        {
+            try
+            {
+                var borrowedHistories = query;
+
+                if (borrowerId != null)
                 {
                     borrowedHistories = borrowedHistories.Where(_ => _.BorrowerId == borrowerId);   
                 }
@@ -48,20 +66,34 @@ namespace LMS.Services
 
                 if (startDate != null)
                 {
-                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowedDate > startDate);
+                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowedDate.Date >= startDate);
                 }
 
                 if (endDate != null)
                 {
-                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowedDate < endDate);
+                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowedDate.Date <= endDate);
                 }
 
                 if (borrowedState != null)
                 {
-                    //borrowedHistories = borrowedHistories.Where(_ => _.borrowedState < endDate);
+                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowedState == borrowedState);
                 }
 
-                return borrowedHistories.ToList();
+                return borrowedHistories;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public int CountPage(IQueryable<BorrowedHistory> query, int pageSize)
+        {
+            try
+            {
+                int totalItems = query.Count();
+                int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+                return totalPages;
             }
             catch (Exception ex)
             {
@@ -85,8 +117,14 @@ namespace LMS.Services
         {
             try
             {
+                if(!(CalcTotalCost() > 0))
+                {
+                    throw new Exception("Total cost must be greater than zero. Please add items to the cart before creating.");
+                }
+
                 borrowedHistory.BorrowedDate = DateTime.Now;
                 borrowedHistory.TotalCost = CalcTotalCost();
+                borrowedHistory.BorrowedState = BorrowedState.Open;
 
                 _borrowedHistoryRepository.Add(borrowedHistory);
 
@@ -120,12 +158,12 @@ namespace LMS.Services
 
                 foreach (var borrowedItem in borrowedHistory.BorrowedItems)
                 {
-                    var item = _itemRepository.GetById(borrowedItem.ItemId);
-
                     // update available quantity of item
-                    item.AvailableQuantity += borrowedItem.Quantity;
-
-                    _itemRepository.Update(item);
+                    if(borrowedItem.ReturnedQuantity < borrowedItem.Quantity)
+                    {
+                        int quantity = (int)(borrowedItem.Quantity - borrowedItem.ReturnedQuantity);
+                        _itemService.UpdateAvailableQuantity(borrowedItem.ItemId, quantity);
+                    }
                 }
 
                 _borrowedHistoryRepository.Delete(id);
@@ -167,6 +205,30 @@ namespace LMS.Services
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public void UpdateBorrowedState(int id)
+        {
+            var borrowedHistory = _borrowedHistoryRepository.GetById(id);
+            var borrowedItems = borrowedHistory.BorrowedItems;
+
+            bool isOpen = false;
+
+            foreach (var borrowedItem in borrowedItems)
+            {
+                if (borrowedItem.ReturnedQuantity < borrowedItem.Quantity)
+                {
+                    isOpen = true;
+                    break;
+                }
+            }
+
+            if (!isOpen)
+            {
+                borrowedHistory.BorrowedState = BorrowedState.Closed;
+            }
+
+            _borrowedHistoryRepository.Update(borrowedHistory);
         }
     }
 }

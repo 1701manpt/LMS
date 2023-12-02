@@ -38,7 +38,5 @@ namespace LMS.Models
 
         public List<BorrowedItem>? BorrowedItems { get; set; }
         public List<BorrowedItemTemp>? BorrowedItemTemps { get; set; }
-        public List<CartItem>? CartItems { get; set; }
-        public List<CartItemTemp>? CartItemTemps { get; set; }
     }
 }

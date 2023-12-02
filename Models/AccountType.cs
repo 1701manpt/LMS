@@ -2,7 +2,7 @@
 {
     public enum AccountType
     {
-        User,
-        Admin
+        Admin,
+        Borrower
     }
 }

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Details";
 }
 
-<div>
+<div class="my-2">
     <a asp-action="Index" class="btn btn-outline-light text-primary"><span>&#8592;</span> Back</a>
 </div>
 <div class="row">
@@ -33,11 +33,18 @@
         <dd>
             @Html.DisplayFor(model => model.TotalCost)
         </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BorrowedState)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BorrowedState)
+        </dd>
     </dl>
     <div class="col-md-8">
         <div class="table-responsive">
-            <table class="table text-center align-content-center table-bordered">
-                <thead>
+            <table class="table align-middle text-center caption-top table-bordered">
+                <caption>List of borrowed items</caption>
+                <thead class="table-light">
                     <tr>
                         <th>
                             @Html.DisplayNameFor(model => model.BorrowedItems[0].Item.Type)
@@ -48,9 +55,13 @@
                         <th>
                             @Html.DisplayNameFor(model => model.BorrowedItems[0].Quantity)
                         </th>
-                        <th colspan="2">
-                            @Html.DisplayNameFor(model => model.BorrowedItems[0].Cost) ( = Quantity <span class="bi bi-x-lg"></span> Price)
+                        <th>
+                            @Html.DisplayNameFor(model => model.BorrowedItems[0].Cost)
                         </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.BorrowedItems[0].ReturnedQuantity)
+                        </th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -68,20 +79,35 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Quantity)
                                 </td>
-                                <td colspan="2" class="text-end">
+                                <td class="text-end">
                                     @Html.DisplayFor(modelItem => item.Cost)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ReturnedQuantity)
+                                </td>
+                                <td>
+                                    @await Html.PartialAsync("~/Views/Shared/PartialViews/_ControlBtnPartial.cshtml",
+                                        new ControlBtnPartialViewModel {
+                                            Id = item.Id,
+                                            ControllerName = "BorrowedItems",
+                                            Return = item.ReturnedQuantity < item.Quantity ? true : false
+                                        }
+                                    )
                                 </td>
                             </tr>
                         }
-                        <tr>
-                            <td colspan="3"></td>
-                            <td>
-                                <b>@Html.DisplayNameFor(model => model.TotalCost)</b>
-                            </td>
-                            <td class="text-end">@Html.DisplayFor(model => model.TotalCost)</td>
-                        </tr>
                     }
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-end">
+                            <b>@Html.DisplayNameFor(model => model.TotalCost) = </b>
+                            @Html.DisplayFor(model => model.TotalCost)
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>

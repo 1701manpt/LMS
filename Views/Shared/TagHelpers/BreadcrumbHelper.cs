@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -55,7 +54,7 @@ namespace LMS.Views.Shared.TagHelpers
                 }
             }
 
-            breadcrumb.Append("</ol></nav><hr />");
+            breadcrumb.Append("</ol></nav><div class=\"w-full border border-1 border-bottom mb-3\"></div>");
 
             return new HtmlString(breadcrumb.ToString());
         }

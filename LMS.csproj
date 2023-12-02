@@ -19,9 +19,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="ViewModels\Books\" />
-    <Folder Include="ViewModels\Borrowers\" />
-    <Folder Include="Views\Shared\PartialViews\" />
   </ItemGroup>
 
 </Project>

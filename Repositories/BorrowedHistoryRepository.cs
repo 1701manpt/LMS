@@ -29,7 +29,7 @@ namespace LMS.Repositories
             }
         }
 
-        public IEnumerable<BorrowedHistory> GetAll()
+        public IQueryable<BorrowedHistory> GetAll()
         {
             try
             {

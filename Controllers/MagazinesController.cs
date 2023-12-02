@@ -1,8 +1,10 @@
 ﻿using LMS.Models;
 using LMS.Services;
 using LMS.Services.Interfaces;
+using LMS.ViewModels.Magazines;
+using LMS.Views.Shared.PartialViews;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Drawing.Printing;
 
 namespace LMS.Controllers
 {
@@ -16,11 +18,34 @@ namespace LMS.Controllers
         }
 
         // GET: Magazines
-        public IActionResult Index()
+        public IActionResult Index(int? pageNumber, int? pageSize)
         {
             try
             {
-                return View(_magazineService.Index());
+                if (!Convert.ToBoolean(pageNumber))
+                {
+                    pageNumber = 1;
+                }
+
+                if (!Convert.ToBoolean(pageSize))
+                {
+                    pageSize = 2;
+                }
+
+                PaginationPartialViewModel pagination = new PaginationPartialViewModel
+                {
+                    TotalPages = _magazineService.CountPage((int)pageSize),
+                    CurrentPage = (int)pageNumber,
+                    PageSize = (int)pageSize
+                };
+
+                IndexViewModel indexViewModel = new IndexViewModel
+                {
+                    Magazines = _magazineService.GetByPage((int)pageNumber, (int)pageSize),
+                    PaginationPartialViewModel = pagination
+                };
+
+                return View(indexViewModel);
             }
             catch (Exception ex)
             {

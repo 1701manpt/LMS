@@ -4,7 +4,7 @@ using LMS.Services.Interfaces;
 
 namespace LMS.Services
 {
-    public class BorrowerService: IBorrowerService
+    public class BorrowerService : IBorrowerService
     {
         private readonly IBorrowerRepository _borrowerRepository;
 
@@ -18,12 +18,55 @@ namespace LMS.Services
             return _borrowerRepository.GetAll().ToList();
         }
 
-        public List<Borrower> Search(string libraryCardNumber)
+        public IQueryable<Borrower> GetAll()
         {
-            return _borrowerRepository
-                .GetAll()
-                .Where(_ => _.LibraryCardNumber.Contains(libraryCardNumber))
-                .ToList();
+            try
+            {
+                return _borrowerRepository.GetAll();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public IQueryable<Borrower> Search(IQueryable<Borrower> query, string? libraryCardNumber)
+        {
+            if(libraryCardNumber != null)
+            {
+                query = query
+                    .Where(_ => _.LibraryCardNumber.Contains(libraryCardNumber));
+            }
+
+            return query;
+        }
+
+        public IQueryable<Borrower> Pagination(IQueryable<Borrower> query, int pageNumber, int pageSize)
+        {
+            try
+            {
+                return query
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public int CountPage(IQueryable<Borrower> query, int pageSize)
+        {
+            try
+            {
+                int totalItems = query.Count();
+                int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+                return totalPages;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public Borrower Details(int id)

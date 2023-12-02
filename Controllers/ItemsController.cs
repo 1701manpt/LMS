@@ -1,6 +1,7 @@
 ﻿using LMS.Models;
-using LMS.Services;
 using LMS.Services.Interfaces;
+using LMS.ViewModels.Items;
+using LMS.Views.Shared.PartialViews;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LMS.Controllers
@@ -15,17 +16,35 @@ namespace LMS.Controllers
         }
 
         // GET: Items
-        public IActionResult Index(string? title)
+        public IActionResult Index(int? pageNumber, int? pageSize, string? title)
         {
             try
             {
-                if (!string.IsNullOrEmpty(title))
+                if (!Convert.ToBoolean(pageNumber))
                 {
-                    ViewData["TitleItem"] = title;
-                    return View(_itemService.Search(title));
+                    pageNumber = 1;
                 }
 
-                return View(_itemService.Index());
+                if (!Convert.ToBoolean(pageSize))
+                {
+                    pageSize = 2;
+                }
+
+                PaginationPartialViewModel pagination = new PaginationPartialViewModel
+                {
+                    TotalPages = _itemService.CountPage((int)pageSize, title),
+                    CurrentPage = (int)pageNumber,
+                    PageSize = (int)pageSize
+                };
+
+                IndexViewModel indexViewModel = new IndexViewModel
+                {
+                    Items = _itemService.GetByPage((int)pageNumber, (int)pageSize, title),
+                    PaginationPartialViewModel = pagination,
+                    Title = title
+                };
+
+                return View(indexViewModel);
             }
             catch (Exception ex)
             {
@@ -59,6 +78,22 @@ namespace LMS.Controllers
                 return View(item);
             }
             catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        public IActionResult Create(int? itemType)
+        {
+            try
+            {
+                ItemType[] arr = (ItemType[])Enum.GetValues(typeof(ItemType));
+                ViewData["ItemTypes"] = arr;
+                ViewData["ItemType"] = itemType;
+                
+                return View();
+            }
+            catch(Exception ex)
             {
                 return BadRequest(ex.Message);
             }
