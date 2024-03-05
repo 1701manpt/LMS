@@ -24,11 +24,11 @@
   
   ![image](https://github.com/1701manpt/LMS/assets/76032325/118b4975-071b-4f85-868f-d5877e2f62c0)
 
-## **Chức năng mượn item:**
+## **5. Chức năng mượn item:**
 
   ![image](https://github.com/1701manpt/LMS/assets/76032325/13451071-07ee-433d-bf59-3974a52844e7)
   
-## **Quản lý lịch sử mượn:**
+## **6. Quản lý lịch sử mượn:**
 - ### **Danh sách lịch sử mượn (lọc)**
   
   ![image](https://github.com/1701manpt/LMS/assets/76032325/f948cc63-17d5-489d-a1c3-b85baed9df85)
