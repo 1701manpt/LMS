@@ -1,3 +1,7 @@
+Thiết kế cơ sở dữ liệu:
+
+  ![image](https://github.com/1701manpt/LMS/assets/76032325/8aa9ff40-6623-4944-a47e-7f2470889130)
+
 Trang chủ:
 
   ![image](https://github.com/1701manpt/LMS/assets/76032325/7862f24c-b4de-417b-ab71-a530476aa6f5)
