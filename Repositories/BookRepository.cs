@@ -18,8 +18,8 @@ namespace LMS.Repositories
             try
             {
                 return _context.Books
-                    .Include(_ => _.BorrowedItems)
-                    .FirstOrDefault(_ => _.Id == id);
+                .Include(_ => _.BorrowedItems)
+                .FirstOrDefault(_ => _.Id == id);
             }
             catch (Exception ex)
             {
@@ -27,12 +27,12 @@ namespace LMS.Repositories
             }
         }
 
-        public IEnumerable<Book> GetAll()
+        public IQueryable<Book> GetAll()
         {
             try
             {
                 return _context.Books
-                    .Include(_ => _.BorrowedItems);
+                .Include(_ => _.BorrowedItems);
             }
             catch (Exception ex)
             {
@@ -70,8 +70,8 @@ namespace LMS.Repositories
         {
             try
             {
-                var book = _context.Books.First(_ => _.Id == id);
-                _context.Books.Remove(book);
+                var item = _context.Books.First(_ => _.Id == id);
+                _context.Books.Remove(item);
                 _context.SaveChanges();
             }
             catch (Exception ex)

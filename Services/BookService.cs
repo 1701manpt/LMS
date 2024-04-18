@@ -4,7 +4,7 @@ using LMS.Services.Interfaces;
 
 namespace LMS.Services
 {
-    public class BookService: IBookService
+    public class BookService : PaginationService<Book>, IBookService
     {
         private readonly IBookRepository _bookRepository;
 
@@ -13,97 +13,35 @@ namespace LMS.Services
             _bookRepository = bookRepository;
         }
 
-        public List<Book> Index()
+        public IQueryable<Book> Index()
         {
-            try
-            {
-                return _bookRepository.GetAll()
-                    .ToList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public List<Book> GetByPage(int pageNumber, int pageSize)
-        {
-            try
-            {
-                return _bookRepository.GetAll()
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public int CountPage(int pageSize)
-        {
-            try
-            {
-                int totalItems = _bookRepository.GetAll().Count();
-                int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
-                return totalPages;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return _bookRepository.GetAll();
         }
 
         public Book Details(int id)
         {
-            try
-            {
-                return _bookRepository.GetById(id);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return _bookRepository.GetById(id);
         }
 
         public Book Create(Book book)
         {
-            try
-            {
-                book.AvailableQuantity = book.Quantity;
+            book.AvailableQuantity = book.Quantity;
 
-                _bookRepository.Add(book);
+            _bookRepository.Add(book);
 
-                return _bookRepository.GetById(book.Id);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return _bookRepository.GetById(book.Id);
         }
 
         public Book Edit(Book book)
         {
-            try
-            {
-                var bookOld = _bookRepository.GetById(book.Id);
+            var bookOld = _bookRepository.GetById(book.Id);
 
-                // Preserve data integrity by assigning information from bookOld to book
-                bookOld.Author = book.Author;
-                bookOld.NumberOfPages = book.NumberOfPages;
-                bookOld.PublicationDate = book.PublicationDate;
-                bookOld.Price = book.Price;
-                bookOld.Title= book.Title;
+            book.Quantity = bookOld.Quantity;
+            book.AvailableQuantity = bookOld.AvailableQuantity;
 
-                _bookRepository.Update(bookOld);
+            _bookRepository.Update(book);
 
-                return _bookRepository.GetById(book.Id);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            return _bookRepository.GetById(book.Id);
         }
 
         public bool Delete(int id)
@@ -129,15 +67,41 @@ namespace LMS.Services
 
         public bool Exist(int id)
         {
+            if (_bookRepository.GetById(id) == null)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public void UpdateAvailableQuantity(int id, int quantity)
+        {
             try
             {
-                if (_bookRepository.GetById(id) == null)
-                {
-                    return false;
-                }
-                return true;
+                var item = _bookRepository.GetById(id);
+
+                item.AvailableQuantity += quantity;
+
+                _bookRepository.Update(item);
             }
-            catch(Exception ex)
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public void CheckAvailableQuantity(int id, int quantity)
+        {
+            try
+            {
+                var item = _bookRepository.GetById(id);
+
+                if (quantity > item.AvailableQuantity)
+                {
+                    throw new Exception("Quantity exceeds available quantity.");
+                }
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }

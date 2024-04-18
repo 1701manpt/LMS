@@ -30,16 +30,21 @@ namespace LMS.Controllers
                     pageSize = 2;
                 }
 
-                PaginationPartialViewModel pagination = new PaginationPartialViewModel
+                var itemList = _bookService.Index();
+
+                PaginationPartialViewModel pagination = new()
                 {
-                    TotalPages = _bookService.CountPage((int)pageSize),
+                    TotalPages = _bookService.CountPage(itemList, (int)pageSize),
                     CurrentPage = (int)pageNumber,
                     PageSize = (int)pageSize
                 };
 
-                IndexViewModel indexViewModel = new IndexViewModel
+                IndexViewModel indexViewModel = new()
                 {
-                    Books = _bookService.GetByPage((int)pageNumber, (int)pageSize),
+                    Books = _bookService
+                                .GetPageByNumberPage(itemList, (int)pageNumber, (int)pageSize)
+                                .Cast<Book>()
+                                .ToList(),
                     PaginationPartialViewModel = pagination
                 };
 

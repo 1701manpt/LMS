@@ -4,7 +4,7 @@ using LMS.Services.Interfaces;
 
 namespace LMS.Services
 {
-    public class BorrowedHistoryService: IBorrowedHistoryService
+    public class BorrowedHistoryService: PaginationService<BorrowedHistory>, IBorrowedHistoryService
     {
         private readonly IBorrowedHistoryRepository _borrowedHistoryRepository;
         private readonly IBorrowedItemTempRepository _borrowedItemTempRepository;
@@ -17,11 +17,11 @@ namespace LMS.Services
             _itemService = itemService;
         }
 
-        public List<BorrowedHistory> Index()
+        public IQueryable<BorrowedHistory> Index()
         {
             try
             {
-                return _borrowedHistoryRepository.GetAll().ToList();
+                return _borrowedHistoryRepository.GetAll();
             }
             catch (Exception ex)
             {
@@ -56,27 +56,31 @@ namespace LMS.Services
 
                 if (borrowerId != null)
                 {
-                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowerId == borrowerId);   
+                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowerId == borrowerId);
                 }
 
                 if(itemId != null)
                 {
-                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowedItems.First().ItemId == itemId);
+                    borrowedHistories = borrowedHistories
+                        .Where(_ => _.BorrowedItems.First().ItemId == itemId);
                 }
 
                 if (startDate != null)
                 {
-                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowedDate.Date >= startDate);
+                    borrowedHistories = borrowedHistories
+                        .Where(_ => _.BorrowedDate.Date >= startDate);
                 }
 
                 if (endDate != null)
                 {
-                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowedDate.Date <= endDate);
+                    borrowedHistories = borrowedHistories
+                        .Where(_ => _.BorrowedDate.Date <= endDate);
                 }
 
                 if (borrowedState != null)
                 {
-                    borrowedHistories = borrowedHistories.Where(_ => _.BorrowedState == borrowedState);
+                    borrowedHistories = borrowedHistories
+                        .Where(_ => _.BorrowedState == borrowedState);
                 }
 
                 return borrowedHistories;
@@ -87,21 +91,7 @@ namespace LMS.Services
             }
         }
 
-        public int CountPage(IQueryable<BorrowedHistory> query, int pageSize)
-        {
-            try
-            {
-                int totalItems = query.Count();
-                int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
-                return totalPages;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public BorrowedHistory Details(int id)
+        public BorrowedHistory? Details(int id)
         {
             try
             {

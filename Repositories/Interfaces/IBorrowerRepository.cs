@@ -2,12 +2,8 @@
 
 namespace LMS.Repositories.Interfaces
 {
-    public interface IBorrowerRepository
+    public interface IBorrowerRepository : IRepository<Borrower>
     {
-        Borrower? GetById(int id);
-        IQueryable<Borrower> GetAll();
-        void Add(Borrower entity);
-        void Update(Borrower entity);
-        void Delete(int id);
+
     }
 }

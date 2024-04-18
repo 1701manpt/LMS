@@ -62,7 +62,7 @@ namespace LMS.Controllers
                     pageSize = 2;
                 }
 
-                PaginationPartialViewModel pagination = new PaginationPartialViewModel
+                PaginationPartialViewModel pagination = new()
                 {
                     PageSize = (int)pageSize,
                     CurrentPage = (int)pageNumber,
@@ -77,7 +77,7 @@ namespace LMS.Controllers
 
                 indexViewModel.PaginationPartialViewModel = pagination;
 
-                borrowedHitoriesQuery = _borrowedHistoryService.Pagination(borrowedHitoriesQuery, (int)pageNumber, (int)pageSize);
+                borrowedHitoriesQuery = _borrowedHistoryService.GetPageByNumberPage(borrowedHitoriesQuery, (int)pageNumber, (int)pageSize);
 
                 indexViewModel.BorrowedHistories = borrowedHitoriesQuery.ToList();
 

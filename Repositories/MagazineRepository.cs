@@ -27,13 +27,12 @@ namespace LMS.Repositories
             }
         }
 
-        public List<Magazine> GetAll()
+        public IQueryable<Magazine> GetAll()
         {
             try
             {
                 return _context.Magazines
-                .Include(_ => _.BorrowedItems)
-                .ToList();
+                .Include(_ => _.BorrowedItems);
             }
             catch (Exception ex)
             {
@@ -71,21 +70,9 @@ namespace LMS.Repositories
         {
             try
             {
-                var magazine = _context.Magazines.First(_ => _.Id == id);
-                _context.Magazines.Remove(magazine);
+                var item = _context.Magazines.First(_ => _.Id == id);
+                _context.Magazines.Remove(item);
                 _context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public void DetachedState(Magazine entity)
-        {
-            try
-            {
-                _context.Entry(entity).State = EntityState.Detached;
             }
             catch (Exception ex)
             {

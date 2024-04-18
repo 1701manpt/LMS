@@ -1,10 +1,11 @@
 ﻿using LMS.Models;
+using LMS.Repositories;
 using LMS.Repositories.Interfaces;
 using LMS.Services.Interfaces;
 
 namespace LMS.Services
 {
-    public class BorrowedItemTempService: IBorrowedItemTempService
+    public class BorrowedItemTempService: PaginationService<BorrowedItemTemp>, IBorrowedItemTempService
     {
         private readonly IBorrowedItemTempRepository _borrowedItemTempRepository;
         private readonly IItemRepository _itemRepository;
@@ -17,7 +18,7 @@ namespace LMS.Services
             _itemService = itemService;
         }
 
-        public List<BorrowedItemTemp> Index()
+        public IQueryable<BorrowedItemTemp> Index()
         {
             try
             {

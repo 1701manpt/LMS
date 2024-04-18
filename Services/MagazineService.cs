@@ -1,11 +1,10 @@
 ﻿using LMS.Models;
-using LMS.Repositories;
 using LMS.Repositories.Interfaces;
 using LMS.Services.Interfaces;
 
 namespace LMS.Services
 {
-    public class MagazineService: IMagazineService
+    public class MagazineService : PaginationService<Magazine>, IMagazineService
     {
         private readonly IMagazineRepository _magazineRepository;
 
@@ -14,38 +13,9 @@ namespace LMS.Services
             _magazineRepository = magazineRepository;
         }
 
-        public List<Magazine> Index()
+        public IQueryable<Magazine> Index()
         {
             return _magazineRepository.GetAll();
-        }
-
-        public List<Magazine> GetByPage(int pageNumber, int pageSize)
-        {
-            try
-            {
-                return _magazineRepository.GetAll()
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public int CountPage(int pageSize)
-        {
-            try
-            {
-                int totalItems = _magazineRepository.GetAll().Count();
-                int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
-                return totalPages;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
         }
 
         public Magazine Details(int id)
@@ -53,36 +23,36 @@ namespace LMS.Services
             return _magazineRepository.GetById(id);
         }
 
-        public Magazine Create(Magazine magazine)
+        public Magazine Create(Magazine dvd)
         {
-            magazine.AvailableQuantity = magazine.Quantity;
+            dvd.AvailableQuantity = dvd.Quantity;
 
-            _magazineRepository.Add(magazine);
+            _magazineRepository.Add(dvd);
 
-            return _magazineRepository.GetById(magazine.Id);
+            return _magazineRepository.GetById(dvd.Id);
         }
 
-        public Magazine Edit(Magazine magazine)
+        public Magazine Edit(Magazine dvd)
         {
-            var magazineOld = _magazineRepository.GetById(magazine.Id);
+            var dvdOld = _magazineRepository.GetById(dvd.Id);
 
-            magazine.Quantity = magazineOld.Quantity;
-            magazine.AvailableQuantity = magazineOld.AvailableQuantity;
+            dvd.Quantity = dvdOld.Quantity;
+            dvd.AvailableQuantity = dvdOld.AvailableQuantity;
 
-            _magazineRepository.Update(magazine);
+            _magazineRepository.Update(dvd);
 
-            return _magazineRepository.GetById(magazine.Id);
+            return _magazineRepository.GetById(dvd.Id);
         }
 
         public bool Delete(int id)
         {
             try
             {
-                var magazine = _magazineRepository.GetById(id);
+                var dvd = _magazineRepository.GetById(id);
 
-                if (magazine?.BorrowedItems != null && magazine.BorrowedItems.Any())
+                if (dvd?.BorrowedItems != null && dvd.BorrowedItems.Any())
                 {
-                    throw new Exception("Cannot delete the magazine because it has been borrowed before.");
+                    throw new Exception("Cannot delete the dvd because it has been borrowed before.");
                 }
 
                 _magazineRepository.Delete(id);
@@ -102,6 +72,39 @@ namespace LMS.Services
                 return false;
             }
             return true;
+        }
+
+        public void UpdateAvailableQuantity(int id, int quantity)
+        {
+            try
+            {
+                var item = _magazineRepository.GetById(id);
+
+                item.AvailableQuantity += quantity;
+
+                _magazineRepository.Update(item);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public void CheckAvailableQuantity(int id, int quantity)
+        {
+            try
+            {
+                var item = _magazineRepository.GetById(id);
+
+                if (quantity > item.AvailableQuantity)
+                {
+                    throw new Exception("Quantity exceeds available quantity.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

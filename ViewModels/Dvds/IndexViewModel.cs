@@ -1,11 +1,11 @@
 ﻿using LMS.Models;
 using LMS.Views.Shared.PartialViews;
 
-namespace LMS.ViewModels.Books
+namespace LMS.ViewModels.Dvds
 {
     public class IndexViewModel
     {
-        public List<Book>? Books { get; set; }
+        public List<Dvd>? Dvds { get; set; }
         public PaginationPartialViewModel? PaginationPartialViewModel { get; set; }
     }
 }

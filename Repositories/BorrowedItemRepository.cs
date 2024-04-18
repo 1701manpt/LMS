@@ -28,14 +28,13 @@ namespace LMS.Repositories
             }
         }
 
-        public List<BorrowedItem> GetAll()
+        public IQueryable<BorrowedItem> GetAll()
         {
             try
             {
                 return _context.BorrowedItems
                     .Include(_ => _.BorrowedHistory)
-                    .Include(_ => _.Item)
-                    .ToList();
+                    .Include(_ => _.Item);
             }
             catch(Exception ex)
             {

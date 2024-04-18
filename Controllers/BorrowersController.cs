@@ -20,7 +20,7 @@ namespace LMS.Controllers
         {
             try
             {
-                IndexViewModel indexViewModel = new IndexViewModel();
+                IndexViewModel indexViewModel = new();
 
                 var borrowersQuery = _borrowerService.GetAll();
 
@@ -50,7 +50,7 @@ namespace LMS.Controllers
 
                 indexViewModel.PaginationPartialViewModel = pagination;
 
-                borrowersQuery = _borrowerService.Pagination(borrowersQuery, (int)pageNumber, (int)pageSize);
+                borrowersQuery = _borrowerService.GetPageByNumberPage(borrowersQuery, (int)pageNumber, (int)pageSize);
 
                 indexViewModel.Borrowers = borrowersQuery.ToList();
 
@@ -87,7 +87,7 @@ namespace LMS.Controllers
                     pageSize = 2;
                 }
 
-                PaginationPartialViewModel pagination = new PaginationPartialViewModel
+                PaginationPartialViewModel pagination = new()
                 {
                     PageSize = (int)pageSize,
                     CurrentPage = (int)pageNumber,
@@ -96,7 +96,7 @@ namespace LMS.Controllers
 
                 indexViewModel.PaginationPartialViewModel = pagination;
 
-                borrowersQuery = _borrowerService.Pagination(borrowersQuery, (int)pageNumber, (int)pageSize);
+                borrowersQuery = _borrowerService.GetPageByNumberPage(borrowersQuery, (int)pageNumber, (int)pageSize);
 
                 indexViewModel.Borrowers = borrowersQuery.ToList();
 

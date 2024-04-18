@@ -55,13 +55,12 @@ namespace LMS.Repositories
             }
         }
 
-        public List<BorrowedItemTemp> GetAll()
+        public IQueryable<BorrowedItemTemp> GetAll()
         {
             try
             {
                 return _context.BorrowedItemTemps
-                    .Include(_ => _.Item)
-                    .ToList();
+                    .Include(_ => _.Item);
             }
             catch (Exception ex)
             {

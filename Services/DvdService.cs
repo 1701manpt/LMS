@@ -1,12 +1,10 @@
 ﻿using LMS.Services.Interfaces;
 using LMS.Repositories.Interfaces;
 using LMS.Models;
-using LMS.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Services
 {
-    public class DvdService: IDvdService
+    public class DvdService : PaginationService<Dvd>, IDvdService
     {
         private readonly IDvdRepository _dvdRepository;
 
@@ -15,7 +13,7 @@ namespace LMS.Services
             _dvdRepository = dvdRepository;
         }
 
-        public List<Dvd> Index()
+        public IQueryable<Dvd> Index()
         {
             return _dvdRepository.GetAll();
         }
@@ -74,6 +72,39 @@ namespace LMS.Services
                 return false;
             }
             return true;
+        }
+
+        public void UpdateAvailableQuantity(int id, int quantity)
+        {
+            try
+            {
+                var item = _dvdRepository.GetById(id);
+
+                item.AvailableQuantity += quantity;
+
+                _dvdRepository.Update(item);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+         
+        public void CheckAvailableQuantity(int id, int quantity)
+        {
+            try
+            {
+                var item = _dvdRepository.GetById(id);
+
+                if (quantity > item.AvailableQuantity)
+                {
+                    throw new Exception("Quantity exceeds available quantity.");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

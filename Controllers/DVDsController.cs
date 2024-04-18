@@ -1,6 +1,10 @@
 ﻿using LMS.Models;
+using LMS.Services;
 using LMS.Services.Interfaces;
+using LMS.ViewModels.Dvds;
+using LMS.Views.Shared.PartialViews;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LMS.Controllers
 {
@@ -14,13 +18,40 @@ namespace LMS.Controllers
         }
 
         // GET: Dvds
-        public IActionResult Index()
+        public IActionResult Index(int? pageNumber, int? pageSize)
         {
             try
             {
-                return View(_dvdService.Index());
+                if (!Convert.ToBoolean(pageNumber))
+                {
+                    pageNumber = 1;
+                }
+
+                if (!Convert.ToBoolean(pageSize))
+                {
+                    pageSize = 2;
+                }
+
+                var itemList = _dvdService.Index();
+
+                PaginationPartialViewModel pagination = new()
+                {
+                    TotalPages = _dvdService.CountPage(itemList, (int)pageSize),
+                    CurrentPage = (int)pageNumber,
+                    PageSize = (int)pageSize
+                };
+
+                IndexViewModel indexViewModel = new()
+                {
+                    Dvds = _dvdService
+                                .GetPageByNumberPage(itemList, (int)pageNumber, (int)pageSize)
+                                .ToList(),
+                    PaginationPartialViewModel = pagination
+                };
+
+                return View(indexViewModel);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
