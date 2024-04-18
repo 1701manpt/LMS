@@ -4,10 +4,8 @@ using LMS.Repositories;
 using LMS.Repositories.Interfaces;
 using LMS.Services;
 using LMS.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("vi-VN");
