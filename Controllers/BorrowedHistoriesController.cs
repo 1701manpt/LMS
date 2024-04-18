@@ -4,8 +4,6 @@ using LMS.ViewModels.BorrowedHistories;
 using LMS.Views.Shared.PartialViews;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Globalization;
 
 namespace LMS.Controllers
 {
