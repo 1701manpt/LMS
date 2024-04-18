@@ -32,21 +32,16 @@ namespace LMS.Controllers
                     pageSize = 2;
                 }
 
-                var itemList = _magazineService.Index();
-
-                PaginationPartialViewModel pagination = new()
+                PaginationPartialViewModel pagination = new PaginationPartialViewModel
                 {
-                    TotalPages = _magazineService.CountPage(itemList, (int)pageSize),
+                    TotalPages = _magazineService.CountPage((int)pageSize),
                     CurrentPage = (int)pageNumber,
                     PageSize = (int)pageSize
                 };
 
-                IndexViewModel indexViewModel = new()
+                IndexViewModel indexViewModel = new IndexViewModel
                 {
-                    Magazines = _magazineService
-                                .GetPageByNumberPage(itemList, (int)pageNumber, (int)pageSize)
-                                .Cast<Magazine>()
-                                .ToList(),
+                    Magazines = _magazineService.GetByPage((int)pageNumber, (int)pageSize),
                     PaginationPartialViewModel = pagination
                 };
 

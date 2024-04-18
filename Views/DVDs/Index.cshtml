@@ -1,4 +1,4 @@
-﻿@model LMS.ViewModels.Dvds.IndexViewModel
+﻿@model IEnumerable<LMS.Models.Dvd>
 
 @{
     ViewData["Title"] = "Index";
@@ -14,36 +14,34 @@
         <thead class="table-light">
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Dvds.First().Type)
+                    @Html.DisplayNameFor(model => model.Type)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Dvds.First().Title)
+                    @Html.DisplayNameFor(model => model.Title)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Dvds.First().Author)
+                    @Html.DisplayNameFor(model => model.Author)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Dvds.First().PublicationDate)
+                    @Html.DisplayNameFor(model => model.PublicationDate)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Dvds.First().RunTime)
+                    @Html.DisplayNameFor(model => model.RunTime)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Dvds.First().Price)
+                    @Html.DisplayNameFor(model => model.Price)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Dvds.First().Quantity)
+                    @Html.DisplayNameFor(model => model.Quantity)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Dvds.First().AvailableQuantity)
+                    @Html.DisplayNameFor(model => model.AvailableQuantity)
                 </th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @if (Model.Dvds != null)
-            {
-            foreach (var item in Model.Dvds)
+            @foreach (var item in Model)
             {
                 <tr>
                     <td>
@@ -74,7 +72,6 @@
                         @await Html.PartialAsync("~/Views/Shared/PartialViews/_ControlBtnPartial.cshtml",
                             new ControlBtnPartialViewModel {
                                 Id = item.Id,
-                                ControllerName = "Dvds",
                                 Edit = true,
                                 Details = true,
                                 Delete = true
@@ -82,8 +79,8 @@
                         )
                     </td>
                 </tr>
-            }}
+            }
         </tbody>
     </table>
 </div>
-@await Html.PartialAsync("~/Views/Shared/PartialViews/_PaginationPartial.cshtml", Model.PaginationPartialViewModel)
+

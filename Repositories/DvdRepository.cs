@@ -18,8 +18,8 @@ namespace LMS.Repositories
             try
             {
                 return _context.Dvds
-                .Include(_ => _.BorrowedItems)
-                .FirstOrDefault(_ => _.Id == id);
+                    .Include(_ => _.BorrowedItems)
+                    .FirstOrDefault(_ => _.Id == id);
             }
             catch (Exception ex)
             {
@@ -27,12 +27,13 @@ namespace LMS.Repositories
             }
         }
 
-        public IQueryable<Dvd> GetAll()
+        public List<Dvd> GetAll()
         {
             try
             {
                 return _context.Dvds
-                .Include(_ => _.BorrowedItems);
+                .Include(_ => _.BorrowedItems)
+                .ToList();
             }
             catch (Exception ex)
             {
@@ -70,9 +71,21 @@ namespace LMS.Repositories
         {
             try
             {
-                var item = _context.Dvds.First(_ => _.Id == id);
-                _context.Dvds.Remove(item);
+                var dvd = _context.Dvds.First(_ => _.Id == id);
+                _context.Dvds.Remove(dvd);
                 _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public void DetachedState(Dvd entity)
+        {
+            try
+            {
+                _context.Entry(entity).State = EntityState.Detached;
             }
             catch (Exception ex)
             {

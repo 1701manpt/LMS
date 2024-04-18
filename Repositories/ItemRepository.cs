@@ -6,7 +6,7 @@ namespace LMS.Repositories
 {
     public class ItemRepository : IItemRepository
     {
-        protected readonly AppDbContext _context;
+        private readonly AppDbContext _context;
 
         public ItemRepository(AppDbContext context)
         {
@@ -27,7 +27,7 @@ namespace LMS.Repositories
             }
         }
 
-        public IQueryable<Item> GetAll()
+        public IEnumerable<Item> GetAll()
         {
             try
             {

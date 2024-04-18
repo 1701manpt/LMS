@@ -1,5 +1,4 @@
 ﻿using LMS.Models;
-using LMS.Services;
 using LMS.Services.Interfaces;
 using LMS.ViewModels.Items;
 using LMS.Views.Shared.PartialViews;
@@ -31,20 +30,16 @@ namespace LMS.Controllers
                     pageSize = 2;
                 }
 
-                var itemList = _itemService.Index();
-
-                PaginationPartialViewModel pagination = new()
+                PaginationPartialViewModel pagination = new PaginationPartialViewModel
                 {
-                    TotalPages = _itemService.CountPage(itemList, (int)pageSize),
+                    TotalPages = _itemService.CountPage((int)pageSize, title),
                     CurrentPage = (int)pageNumber,
                     PageSize = (int)pageSize
                 };
 
-                IndexViewModel indexViewModel = new()
+                IndexViewModel indexViewModel = new IndexViewModel
                 {
-                    Items = _itemService
-                                .GetPageByNumberPage(itemList, (int)pageNumber, (int)pageSize)
-                                .ToList(),
+                    Items = _itemService.GetByPage((int)pageNumber, (int)pageSize, title),
                     PaginationPartialViewModel = pagination,
                     Title = title
                 };

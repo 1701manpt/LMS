@@ -4,7 +4,7 @@ using LMS.Services.Interfaces;
 
 namespace LMS.Services
 {
-    public class BorrowerService : PaginationService<Borrower>, IBorrowerService
+    public class BorrowerService : IBorrowerService
     {
         private readonly IBorrowerRepository _borrowerRepository;
 
@@ -13,9 +13,9 @@ namespace LMS.Services
             _borrowerRepository = borrowerRepository;
         }
 
-        public IQueryable<Borrower> Index()
+        public List<Borrower> Index()
         {
-            return _borrowerRepository.GetAll();
+            return _borrowerRepository.GetAll().ToList();
         }
 
         public IQueryable<Borrower> GetAll()
@@ -48,6 +48,20 @@ namespace LMS.Services
                 return query
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public int CountPage(IQueryable<Borrower> query, int pageSize)
+        {
+            try
+            {
+                int totalItems = query.Count();
+                int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+                return totalPages;
             }
             catch (Exception ex)
             {

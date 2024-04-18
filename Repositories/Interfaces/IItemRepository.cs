@@ -1,9 +1,13 @@
 ﻿using LMS.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Repositories.Interfaces
 {
-    public interface IItemRepository : IRepository<Item>
+    public interface IItemRepository
     {
+        Item? GetById(int id);
+        IEnumerable<Item> GetAll();
+        void Add(Item entity);
+        void Update(Item entity);
+        void Delete(int id);
     }
 }

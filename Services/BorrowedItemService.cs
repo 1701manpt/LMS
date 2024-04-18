@@ -2,11 +2,10 @@
 using LMS.Repositories.Interfaces;
 using LMS.Models;
 using NuGet.Packaging;
-using LMS.Repositories;
 
 namespace LMS.Services
 {
-    public class BorrowedItemService: PaginationService<BorrowedItem>, IBorrowedItemService
+    public class BorrowedItemService: IBorrowedItemService
     {
         private readonly IBorrowedItemRepository _borrowedItemRepository;
         private readonly IBorrowedItemTempRepository _borrowedItemTempRepository;
@@ -21,7 +20,7 @@ namespace LMS.Services
             _itemService = itemService;
         }
 
-        public IQueryable<BorrowedItem> Index()
+        public List<BorrowedItem> Index()
         {
             try
             {
@@ -47,13 +46,6 @@ namespace LMS.Services
             }
         }
 
-        public BorrowedItem Create(BorrowedItem item)
-        {
-            _borrowedItemRepository.Add(item);
-
-            return _borrowedItemRepository.GetById(item.Id);
-        }
-
         public void CreateBorrowedItems(int borrowedHistoryId)
         {
             try
@@ -71,7 +63,7 @@ namespace LMS.Services
                         BorrowedHistoryId = borrowedHistoryId
                     };
 
-                    Create(borrowedItem);
+                    _borrowedItemRepository.Add(borrowedItem);
 
                     _borrowedItemTempRepository.Delete(borrowedItemTemp.Id);
                 }
